@@ -1,0 +1,712 @@
+#+title: Peteches Emacs Stuff
+#+PROPERTY: header-args:emacs-lisp :tangle ~/.emacs.d/init.el
+#+PROPERTY: header-args :results silent :mkdirp yes
+
+** Basics
+
+*** Add package things
+
+These will be needed for most of the rest of the config so best set it up first.
+
+#+begin_src emacs-lisp
+  (require 'package)
+  (progn
+        ;; load emacs 24's package system. Add MELPA repository.
+        (require 'package)
+        (add-to-list
+         'package-archives
+         '("melpa" . "https://melpa.org/packages/")
+         t))
+  (package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+#+end_src
+
+*** Tidy up some UI elements
+**** fix ugly old school defaults for a minimal look
+#+begin_src emacs-lisp
+  (setq inhibit-startup-message t)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+#+end_src
+
+**** Allow following version controlled files
+#+begin_src emacs-lisp
+  (setq vc-follow-symlinks t)
+#+end_src
+
+**** setup line numbering everywhere
+#+begin_src emacs-lisp
+  (global-display-line-numbers-mode 'relative)
+  (column-number-mode)
+#+end_src
+
+**** except some modes
+#+begin_src emacs-lisp
+  (dolist (mode '(org-mode-hook
+		  term-mode-hook
+                  shell-mode-hook
+		  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+#+end_src
+
+**** Configure a sweet ModeLine
+
+***** Install all icons doom uses
+On fist use on after the package is installed you need to run
+
+=M-x all-the-icons-install-fonts=
+
+#+begin_src emacs-lisp
+  (use-package all-the-icons)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1))
+#+end_src
+
+*** Set up some global modes / settings
+#+begin_src emacs-lisp
+(add-hook 'after-init-hook 'global-company-mode)
+#+end_src
+
+**** which-key
+#+begin_src emacs-lisp
+  (use-package which-key
+    :init (which-key-mode)
+    :diminish which-key-mode
+    :config
+    (setq which-key-idle-delay 0.3))
+#+end_src
+
+*** Let's not clutter my init.el with customize stuff
+
+#+begin_src emacs-lisp
+  (setq custom-file (locate-user-emacs-file "custom-vars.el"))
+  (load custom-file 'noerror 'nomessage)
+#+end_src
+
+*** Dired
+
+**** Basics
+
+- Setting dwim allows fancy copying between dired buffers
+- Set flags to =ls= to better display files.
+
+#+begin_src emacs-lisp
+  (use-package dired
+    ; dired is not installable as it's builtin
+  :ensure nil
+  :commands (dired dired-jump)
+  :config
+  (setq insert-directory-program "/usr/local/bin/exa")
+  :custom
+  ((dired-dwim-target t)
+   (dired-hide-details-hide-symlink-targets t)
+   (directory-listing-before-filename-regexp "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] \\([01][0-9]\\|2[0-3]\\):[0-5][0-9] +")
+   (dired-listing-switches "--classify --long --all --sort=Name --group-directories-first --time-style=long-iso --no-user")))
+#+end_src
+
+**** Fancy Icons
+#+begin_src emacs-lisp
+  (use-package all-the-icons-dired
+  :hook (dired-mode . all-the-icons-dired-mode))
+#+end_src
+
+*** Configure Fonts
+#+begin_src emacs-lisp
+  (set-face-attribute 'default nil :font "Menlo" :height 110)
+#+end_src
+
+
+*** Setup Theme Stuff
+**** Modus theme
+#+begin_src emacs-lisp
+  (setq global-auto-revert-non-file-buffers t)
+  (setq modus-themes-mode-line '(borderless)
+	modus-themes-bold-constructs t
+	modus-themes-italic-constructs t
+	modus-themes-fringes 'subtle
+	modus-themes-tabs-accented t
+	modus-themes-paren-match '(bold intense)
+	modus-themes-prompts '(bold intense)
+        modus-themes-completions '(opinionated)
+        modus-themes-org-blocks 'tinted-background
+        modus-themes-scale-headings t
+        modus-themes-region '(bg-only)
+        modus-themes-syntax '(alt-syntax faint)
+        modus-themes-headings
+        '((1 . (rainbow overline background 1.4))
+          (2 . (rainbow background 1.3))
+          (3 . (rainbow bold 1.2))
+          (t . (semilight 1.1))))
+#+end_src
+
+**** Setup Doom theme
+#+begin_src emacs-lisp
+      (use-package doom-themes)
+#+end_src
+
+**** Load the theme we want.
+#+begin_src emacs-lisp
+  (load-theme 'doom-gruvbox t)
+#+end_src
+
+*** Set keymap to reload config
+
+#+begin_src emacs-lisp
+  (defun reload-dotemacs ()
+  (interactive)
+  (when (file-readable-p "~/.emacs.d/config.org")
+    (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+  )
+  (global-set-key (kbd "C-c <f12>") 'reload-dotemacs)
+#+end_src
+
+*** Setup Ivy completion
+**** Install base ivy
+#+begin_src emacs-lisp
+    (use-package swiper
+     :bind (("C-s" . swiper)))
+    (use-package ivy
+    :diminish
+    :bind (:map ivy-minibuffer-map
+	   ("TAB" . ivy-alt-done)
+	   ("C-l" . ivy-alt-done)
+	   ("C-j" . ivy-next-line)
+	   ("C-k" . ivy-previous-line)
+	   :map ivy-switch-buffer-map
+	   ("C-k" . ivy-previous-line)
+	   ("C-l" . ivy-done)
+	   ("C-d" . ivy-switch-buffer-kill)
+	   :map ivy-reverse-i-search-map
+	   ("C-k" . ivy-previous-line)
+	   ("C-d" . ivy-reverse-i-search-kill))
+    :config
+    (ivy-mode 1))
+#+end_src
+
+**** Add Ivy Rich for richer ivy info
+#+begin_src emacs-lisp
+  (use-package ivy-rich
+    :after counsel
+    :init
+    (ivy-rich-mode 1))
+#+end_src
+
+**** Add counsel
+#+begin_src emacs-lisp
+(use-package counsel
+  :bind (("M-x". counsel-M-x)
+         ("C-x b" . counsel-ibuffer)
+	 ("C-x C-f". counsel-find-file)
+	 :map minibuffer-local-map
+	 ("C-r" . çounsel-minibuffer-history))
+  :config
+  (setq ivy-initial-inputs-alist nil))
+#+end_src
+
+*** Setup Company completion
+**** Set up some global modes / settings
+#+begin_src emacs-lisp
+  (use-package company
+    :hook
+    (add-hook 'after-init-hook 'global-company-mode)
+    :config
+    (company-mode))
+#+end_src
+
+*** Lets use a Helpful package
+#+begin_src emacs-lisp
+  (use-package helpful
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key] . helpful-key)
+  )
+#+end_src
+
+** Keybindings
+*** Install general (A keybinding package)
+General allows us to define custom prefixes and easily map all the child mapping within it.
+
+#+begin_src emacs-lisp
+(use-package general
+  :config
+  (general-create-definer peteches/leader-keys
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+  (peteches/leader-keys
+    "t" '(:ignore t :which-key "toggles")
+    "tt"'(counsel-load-theme :which-key "Choose Theme")))
+#+end_src
+
+*** Use Hydra for additional keybinding shortcuts
+Install hydra first
+#+begin_src emacs-lisp
+(use-package hydra)
+#+end_src
+
+**** Text scaling
+
+#+begin_src emacs-lisp
+(defhydra hydra-text-scale (:timeout 4)
+  "Scale text"
+  ("j" text-scale-decrease "Smaller")
+  ("k" text-scale-increase "Larger")
+  ("f" nil "Finished" :exit t))
+ (peteches/leader-keys
+   "ts" '(hydra-text-scale/body :which-key "Scale text"))
+ #+end_src
+
+** I am EVIL
+*** First lets make <Esc> Work like it should :P
+#+begin_src emacs-lisp
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+end_src
+
+
+*** So let's set up some evil mode.
+**** Setup a function to disable Evil in some buffers
+Not sure why just yet but this hook seems to stop evil-mode working everywhere.
+#+begin_src emacs-lisp
+;  (defun peteches/evil-hook ()
+;    (dolist (mode  '(custom-mode
+;		     eshell-mode
+;		     git-rebase-mode
+;		     erc-mode
+;		     term-mode))
+;	  (add-to-list 'evil-emacs-state-modes mode)))
+#+end_src
+
+**** Now install evil and add evil-hook
+#+begin_src emacs-lisp
+  (use-package evil
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-C-i-jump nil)
+    ; :hook (evil-mode . peteches/evil-hook)
+    :config
+    (evil-mode 1)
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal))
+#+end_src
+
+**** Evil Collection set's up a bunch of consistent keybindings across multiple modes.
+#+begin_src emacs-lisp
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
+#+end_src
+
+** Language Support
+*** Globally useful
+**** Flycheck
+[[https://www.flycheck.org/en/latest/index.html][FlyCheck]] is a modern on-the-fly syntax checking extension for GNU Emacs.
+#+begin_src emacs-lisp
+  (use-package flycheck
+  :init (global-flycheck-mode))
+#+end_src
+**** Rainbow delimiters
+#+begin_src emacs-lisp
+    (use-package rainbow-delimiters
+	:hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+**** LSP Baby Yeah!
+***** We'll set up some functions first
+****** Add breadcrumbs to LSP buffers:
+This sets up a trace of where the point is withing the project.
+#+begin_src emacs-lisp
+(defun peteches/lsp-mode-breadcrumbs ()
+  (setq lsp-hqeaderline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
+#+end_src
+
+***** Then wrap them up in a single wrapper hook function
+#+begin_src emacs-lisp
+  (defun peteches/lsp-mode-settings ()
+    (peteches/lsp-mode-breadcrumbs)
+  )
+#+end_src
+
+***** Install LSP
+#+begin_src emacs-lisp
+    (use-package lsp-mode
+      :commands lsp lsp-deferred
+      :init
+	(setq lsp-keymap-prefix "C-c l")
+      :config
+	(lsp-enable-which-key-integration t)
+	(setq lsp-go-build-flags (vector "--tags=integration"))
+      :hook
+	(
+	  (go-mode . lsp)
+	  (lsp-mode . peteches/lsp-mode-settings)
+	)
+    )
+  (use-package lsp-ui
+    :hook (lsp-mode . lsp-ui-mode)
+    :custom
+    (lsp-ui-doc-position 'bottom))
+#+end_src
+**** Add IVY integration to lsp
+lsp-ivy integrates Ivy with lsp-mode to make it easy to search for things by name in your code. When you run these commands, a prompt will appear in the minibuffer allowing you to type part of the name of a symbol in your code. Results will be populated in the minibuffer so that you can find what you’re looking for and jump to that location in the code upon selecting the result.
+
+Try these commands with =M-x=:
+
+  - =lsp-ivy-workspace-symbol= - Search for a symbol name in the current project workspace
+  - =lsp-ivy-global-workspace-symbol= - Search for a symbol name in all active project workspaces
+
+#+begin_src emacs-lisp
+(use-package lsp-ivy)
+#+end_src
+
+**** Install DAP mode
+#+begin_src emacs-lisp
+  (use-package dap-mode
+    :config
+    (general-define-key
+     :keymaps 'lsp-mode-map
+     :prefix lsp-keymap-prefix
+     "d" '(dap-hydra t :wk "debugger")))
+#+end_src
+
+*** Go
+I like Golang so lets set it up
+**** Install go-mode
+#+begin_src emacs-lisp
+  (use-package go-mode
+    :config
+    (require 'dap-dlv-go))
+#+end_src
+
+*** Org
+A lot of this Ricing is lifted from  [[https://lucidmanager.org/productivity/ricing-org-mode/][Lucid Manager]].
+**** Install latest org and configure
+Org is installed by default, but this makes sure we're on the latest version. Also =use-package= helps eep the config tidy
+#+begin_src emacs-lisp
+  (use-package org
+    :ensure org-contrib
+    :config
+    (setq org-startup-indented t
+          org-pretty-entities t
+          org-hide-emphasis-markers t
+          org-startuph-inline-images t
+          line-spacing 6
+          org-image-actual-width '(900)))
+#+end_src
+
+**** Nice Bullets
+[[https://github.com/integral-dw/org-superstar-mode][Org-superstar]] will make bullets and lists much nicer to look at
+
+#+begin_src emacs-lisp
+  (use-package org-superstar
+  :config
+  (setq org-superstar-special-todo-items t)
+  (add-hook 'org-mode-hook (lambda ()
+			     (org-superstar-mode 1))))
+#+end_src
+
+**** Use mixed-pitch package
+The [[https://gitlab.com/jabranham/mixed-pitch][mixed pitch package]], by Alex Branham, allows seperation of variable and fixed width configs
+#+begin_src emacs-lisp
+  (use-package mixed-pitch
+  :hook (text-mode . mixed-pitch-mode)
+  :config
+  (set-face-attribute 'default nil :font "PT Mono" :height 130)
+  (set-face-attribute 'fixed-pitch nil :font "PT Mono")
+  (set-face-attribute 'variable-pitch nil :font "Georgia"))
+  (add-hook 'mixed-pitch-mode #'solaire-mode-reset)
+#+end_src
+**** Use a postframe for company mode
+Some dropdowns get screwed up by variable width fonts [[https://github.com/tumashu/company-posframe][company-posframe]] this *should* fix that.
+#+begin_src emacs-lisp
+  (use-package company-posframe
+    :config
+    (company-posframe-mode 1))
+#+end_src
+**** Olivetti provides distraction free env
+#+begin_src emacs-lisp
+  (use-package olivetti
+    :init
+    (setq olivetti-body-width .67)
+    :config
+    (defun distraction-free ()
+      "Distraction-free writing environment"
+      (interactive)
+      (if (equal olivetti-mode nil)
+	  (progn
+	    (window-configuration-to-register 1)
+	    (delete-other-windows)
+	    (text-scale-increase 2)
+	    (olivetti-mode t))
+	(progn
+	  (jump-to-register 1)
+	  (olivetti-mode 0)
+	  (text-scale-decrease 2))))
+    :bind
+    (("<f9>" . distraction-free)))
+    #+end_src
+**** Template languages
+Define more structure languages snippets
+#+begin_src emacs-lisp
+  (with-eval-after-load 'org
+  (require 'org-tempo)
+  (add-to-list 'org-structure-template-alist '("el". "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("sh" . "src bash"))
+  (add-to-list 'org-structure-template-alist '("zsh" . "src zsh"))
+  (add-to-list 'org-structure-template-alist '("py". "src python"))
+  (add-to-list 'org-structure-template-alist '("la". "export latex")))
+#+end_src
+
+Add ox-extra
+#+begin_src emacs-lisp
+  (use-package ox-extra
+    :ensure nil
+    :config
+    (ox-extras-activate '(latex-header-blocks ignore-headlines)))
+
+#+end_src
+
+***** External packages
+****** Golang
+#+begin_src emacs-lisp
+    (use-package ob-go
+      :config
+      (add-to-list 'org-structure-template-alist '("go" . "src go :imports '()")))
+#+end_src
+****** Mermaid
+#+begin_src emacs-lisp
+  (use-package ob-mermaid
+    :config
+    (add-to-list 'org-structure-template-alist '("mmd" . "src mermaid :file ./mermaid.png")))
+#+end_src
+
+*****  load languages
+Add Babel language support this is done after installing external packages so dependencies exist
+#+begin_src emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (shell . t)
+     (go . t)
+     (mermaid . t)
+     (python . t)))
+   (setq org-confirm-babel-evaluate nil)
+#+end_src
+****** Latex
+need to set the pdflatex dir if it's not in PATH
+#+begin_src emacs-lisp
+  (setq peteches/pdflatex ""
+      peteches/pdflatexcmd (concat
+                            peteches/pdflatex
+                            " -interaction nonstopmode -output-directory %o %f"
+                                   ))
+#+end_src
+
+To make nice pdf's from latex.
+#+begin_src emacs-lisp
+      (use-package ox-latex
+        :ensure nil
+        :config
+        (setq org-latex-pdf-process
+              '("/usr/local/texlive/2022/bin/universal-darwin/pdflatex -interaction nonstopmode -output-directory %o %f"
+                "/usr/local/texlive/2022/bin/universal-darwin/pdflatex -interaction nonstopmode -output-directory %o %f"
+                "/usr/local/texlive/2022/bin/universal-darwin/pdflatex -interaction nonstopmode -output-directory %o %f")
+              org-latex-with-hyperref nil
+              org-latex-logfiles-extensions
+              (quote ("lof" "lot" "tex~" "aux" "idx" "log" "out" "toc" "nav"
+                      "snm" "vrb" "dvi" "fdb_latexmk" "blg" "brf" "fls" "entoc"
+                      "ps" "spl" "bbl" "xmpi" "run.xml" "bcf" "acn" "acr" "alg"
+                      "glg" "gls" "ist")))
+        (unless (boundp 'org-latex-classes)
+          (setq org-latex-classes nil)))
+#+end_src
+**** Auto tangle config
+This snippet adds a hook to =org-mode= buffers so that =efs/org-babel-tangle-config= gets executed each time such a buffer gets saved. This function checks to see if the file being saved is the Emacs.org file you’re looking at right now, and if so, automatically exports the configuration here to the associated output files.
+#+begin_src emacs-lisp
+  ;; Automatically tangle our Emacs.org config file when we save it
+  (defun peteches/org-babel-tangle-config ()
+    (when (string-match  "OrgModeConfigs\\(.git\\)?/.*\\.org$" (buffer-file-name))
+      ;; Dynamic scoping to the rescue
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
+
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'peteches/org-babel-tangle-config)))
+#+end_src
+
+**  Add Terminal Emulations
+*** Vterm
+[[https://github.com/akermu/emacs-libvterm][Vterm]] is a compiled terminal emulator for emacs that is faster than eshell.
+#+begin_src emacs-lisp
+  (use-package vterm
+    :custom
+    (setq vterm-max-scrollback 100000)
+    :bind
+   ("C-c t" . vterm-other-window))
+#+end_src
+
+** Project navigations
+*** Setup helper function for project discovery
+#+begin_src emacs-lisp
+
+  (defun peteches/find-go-projects (dir)
+    (split-string (shell-command-to-string
+		   (format "fd --print0 --type file go.mod %s --exec dirname" dir)
+		   )
+    ))
+
+#+end_src
+
+*** Use projectile to help navigate projects
+#+begin_src emacs-lisp
+  (use-package projectile
+    :diminish projectile-mode
+    :config
+    (projectile-mode)
+    (projectile-register-project-type 'golang '("go.mod" "go.sum")
+				      :project-file "go.mod"
+				      :compile "go build"
+				      :test "go test ./..."
+				      :run "go run"
+				      :test-suffix "_test.go")
+    (add-to-list 'projectile-project-root-files "go.mod")
+    (setq projectile-project-search-path (peteches/find-go-projects "~/area_51/"))
+    (setq projectile-indexing-method 'alien)
+    (setq projectile-generic-command '"fd --print0 --type file")
+
+    :custom
+    (projectile-completion-system 'ivy)
+    (projectile-project-root-functions
+     '(projectile-root-local
+       projectile-root-marked
+       projectile-root-top-down
+       projectile-root-top-down-recurring
+       projectile-root-bottom-up
+       ))
+    :bind-keymap
+    ("C-c p" . projectile-command-map))
+
+#+end_src
+
+*** Also integrate with counsel
+#+begin_src emacs-lisp
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
+#+end_src
+
+** Magit Awesome Git porcelain
+Magit https://magit.vc is a nice git porcelain inside emacs
+*** Install Packages
+#+begin_src emacs-lisp
+  (use-package magit)
+#+end_src
+
+** Email
+*** Setup Mail Sync
+**** Install dependencies
+#+begin_src bash :tangle no
+brew install isync mu
+#+end_src
+
+**** Create mbsync config
+First need to sync mail, Using mb sync, RC Config example:
+#+begin_src conf :tangle ~/.mbsyncrc :results nil
+    IMAPAccount fastmail
+    Host imap.fastmail.com
+    User pete@peteches.co.uk
+    UseKeychain yes
+    SSLType IMAPS
+    AuthMechs LOGIN
+
+    IMAPStore fastmail-remote
+    Account fastmail
+
+    MaildirStore fastmail-local
+    Subfolders Verbatim
+    Path ~/Mail/peteches.co.uk/
+    Inbox ~/Mail/peteches.co.uk/enbox
+
+    Channel fastmail
+    Far :fastmail-remote:
+    Near :fastmail-local:
+    Patterns * !Inbox/L1
+    Expunge None
+    CopyArrivalDate yes
+    Sync All
+    Create Both
+    SyncState *
+#+end_src
+
+****  Run initial sync
+Then sync mail by running:
+#+begin_src bash :tangle no :results none
+  mkdir -p ~/Mail/peteches.co.uk
+  /usr/local/bin/mbsync -a
+#+end_src
+
+**** Index mail
+Need to index mail by running the below:
+#+begin_src bash :tabgle no :results none
+  /usr/local/bin/mu init --mu-home ~/Mail/.mu-cache -m ~/Mail/ "--my-address=/.*@peteches.co.uk$/"
+  /usr/local/bin/mu index --mu-home ~/Mail/.mu-cache
+#+end_src
+
+*** Configure Emacs
+**** Install mu4e
+#+begin_src emacs-lisp
+  (use-package mu4e
+    :ensure nil
+    :load-path "/usr/local/Cellar/mu/1.8.13/share/emacs/site-lisp/mu/mu4e"
+    :config
+    (setq mu4e-change-filenames-when-moving t
+          mu4e-update-interval (* 10 60)
+          mu4e-get-mail-command "/usr/local/bin/mbsync -a"
+          mu4e-maildir "~/Mail"
+
+          mu4e-mu-binary "/usr/local/Cellar/mu/1.8.13/bin/mu"
+          mu4e-mu-home "~/Mail/.mu-cache"
+
+          mu4e-contexts (list
+                         ;; Personal
+                         (make-mu4e-context
+                          :name "Personal"
+                          :match-func
+                          (lambda (msg)
+                            (when msg
+                              (string-prefix-p "/peteches.co.uk" (mu4e-message-field msg :maildir))))
+                          :vars '(
+                                  (user-full-name . "Pete McCabe")
+
+                                  (mu4e-drafts-folder . "/peteches.co.uk/Drafts")
+                                  (mu4e-sent-folder . "/peteches.co.uk/Sent")
+                                  (mu4e-refile-folder . "/peteches.co.uk/Archive")
+                                  (mu4e-trash-folder . "/peteches.co.uk/Bin")
+                                  ))
+                         )
+
+          mu4e-maildir-shortcuts
+          '(("/peteches.co.uk/Inbox"     . ?i)
+            ("/peteches.co.uk/Sent"      . ?s)
+            ("/peteches.co.uk/Drafts"    . ?d)
+            ("/peteches.co.uk/Bin"       . ?b)))
+    (mu4e t)
+    )
+
+#+end_src
