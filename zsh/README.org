@@ -1,0 +1,346 @@
+#+title: Peteches Zsh Stuff
+#+PROPERTY: header-args :results silent :mkdirp yes :tangle-mode o644
+
+Zsh is my prefered terminal. Docs: [[https://zsh.sourceforge.io/Doc/Release/zsh_toc.html][on sourceforge]]
+
+* Useful info
+
+** Startup
+Zsh reads different [[https://zsh.sourceforge.io/Doc/Release/Files.html#Files-1][startup files]] depending on how it's invoked.
+
+* Basics
+** Autoloading
+Zsh supports lazy loading functions, via [[https://zsh.sourceforge.io/Doc/Release/Functions.html#index-functions_002c-autoloading][autoloading]]. This saves time during zsh startup so functions are only loaded when used.
+To support custom functions, defined later on, we need to update the =fpath=
+#+begin_src bash :tangle ~/.config/zsh/.zprofile
+  fpath=( ~/.config/zsh/functions/ $fpath )
+#+end_src
+
+We now need to autoload any finctions found in any of the fpath directories.
+#+begin_src bash :tangle ~/.config/zsh/.zprofile
+  for fdir in ${fpath[@]}; do
+      if [[ -d $fdir ]]; then
+          autoload $fdir/*(N:t) >/dev/null
+      fi
+  done
+#+end_src
+
+** Environment
+
+*** ZDOTDIR
+[[https://zsh.sourceforge.io/Doc/Release/Parameters.html#index-ZDOTDIR][ZDOTDIR]] defines where zsh looks for config files =.zshrc= etc.
+#+begin_src bash :tangle ~/.zshenv
+    export ZDOTDIR=${HOME}/.config/zsh
+    source ${ZDOTDIR}/.zshenv
+#+end_src
+
+*** PATH
+[[https://zsh.sourceforge.io/Doc/Release/Parameters.html#index-PATH][PATH]] is a colon seperated list of directories to search when running commands
+Deriving =PATH= from =path_dirs= may seem awkward, but it lets me lay out hte path directories in a visually better manner.
+#+begin_src bash :tangle ~/.config/zsh/.zshenv
+  path_dirs=(
+      /usr/local/Cellar/gnu-sed/4.8/bin/
+      /usr/local/Cellar/coreutils/9.0/bin/
+      /opt/homebrew/bin
+      /opt/homebrew/sbin
+      ${HOME}/.local/bin
+      ${HOME}/go/bin
+      /usr/local/bin
+      /usr/local/sbin
+      /usr/bin
+      /usr/sbin
+      /bin
+      /sbin
+    )
+  export PATH=$(echo ${path_dirs[@]} | tr ' ' ':')
+#+end_src
+*** Editor
+Lets setup emacsclient as our editor of choice
+#+begin_src bash :tangle ~/.config/zsh/.zshenv
+export EDITOR=$(whence emacsclient)
+#+end_src
+***  PS4
+The [[https://zsh.sourceforge.io/Doc/Release/Parameters.html#index-PS4][PS4]] prompt is the execution trace promp. Useful when debugging shell scripts
+#+begin_src bash :tangle ~/.config/zsh/.zshenv
+export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+#+end_src
+*** Key timeout
+The [[https://zsh.sourceforge.io/Doc/Release/Parameters.html#index-KEYTIMEOUT][KEYTIMEOUT]] is the delay in milliseconds Zsh will wait for multi-char sequences
+#+begin_src bash :tangle ~/.config/zsh/.zshenv
+export KEYTIMEOUT=500
+#+end_src
+*** Zsh Custom Directories
+Zsh custom directory is used for installing and loading custom stuff.
+#+begin_src bash :tangle ~/.config/zsh/.zshenv
+export ZSH_CUSTOM=~/.config/zsh
+#+end_src
+*** CDPATH
+[[https://zsh.sourceforge.io/Doc/Release/Parameters.html#index-CDPATH][CDPATH]] variable works like the [[PATH][PATH]] variable, but for switching directories:
+I want easy access to all my =area_51= subdirs as that's where I do most of my work
+#+begin_src bash :tangle ~/.config/zsh/.zshenv
+  cdpath=( $cdpath ~/area_51/* ~/area_51/*/* )
+export cdpath
+#+end_src
+*** History
+#+begin_src bash :tangle ~/.config/zsh/.zshenv
+  HISTSIZE=100000
+  SAVEHIST=100000
+#+end_src
+
+** Aliases
+Aliases are super useful and I like making theme
+
+*** LS
+So =ls= is fine an all, but I really quite like [[https://the.exa.website/][exa]], but apparenly my muscle memory isn't catching up!
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  alias ll='exa --all --header --long --classify --git'
+  alias la='exa --all --git'
+  alias l='exa --header --classify --git --long'
+  alias ls='exa --header --long --git'
+  alias ks='exa' # yeah another typo fix
+#+end_src
+
+*** Sudo
+Almost pointless, but this alias ensures that any =sudo='ed commands get scanned for aliases too
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  alias sudo='sudo '
+#+end_src
+
+*** Animations
+This is just a bit of fun really.
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  alias door='clear;x=$(($COLUMNS/2));y=$(($LINES/2));c=0;n=1;a=90;while :;do bgc=$(($c%232 + 16));case "$a" in 0)xd=0;yd=-1;n=$(($n+1));; 90)xd=1;yd=0;; 180)xd=0;yd=1;n=$(($n+1));; 270)xd=-1;yd=0 ;; *) break ;; esac; for ((i=0;i < $n;i++));do if [[ $x -ge $COLUMNS || $x -le 0 || $y -ge $LINES || $y -le 0 ]]; then x=$(($COLUMNS/2));y=$(($LINES/2));n=1;a=0; continue ; fi ; printf "\033[%s;%sH\033[48;5;%sm \033[0m" $y $x $bgc ; x=$(( $x + $xd )); y=$(( $y + $yd )); done ; c=$(( $c + 1 )); a=$(( $(( $a + 90 )) % 360 )) ; sleep 0.001; done'
+  alias worm='a=1;x=1;y=1;xd=1;yd=1;while true;do if [[ $x == $LINES || $x == 0 ]]; then xd=$(( $xd *-1 )) ; fi ; if [[ $y == $COLUMNS || $y == 0 ]]; then yd=$(( $yd * -1 )) ; fi ; x=$(( $x + $xd )); y=$(( $y + $yd )); printf "\33[%s;%sH\33[48;5;%sm \33[0m" $x $y $(($a%199+16)) ;a=$(( $a + 1 )) ; sleep 0.001 ;done'
+  alias snow='clear;while :;do echo $LINES $COLUMNS $(($RANDOM%$COLUMNS)) $(printf "\u2743\n");sleep 0.1;done|gawk '\''{a[$3]=0;for(x in a) {o=a[x];a[x]=a[x]+1;printf "\033[%s;%sH ",o,x;printf "\033[%s;%sH%s \033[0;0H",a[x],x,$4;}}'\'''
+#+end_src
+
+*** Git
+Git alias are OK, but not nearly as good as shell aliases.
+
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  alias gma='git merge --abort'
+  alias gmnff='git merge --no-ff'
+  alias gs='echo "Did you really mean to invoke ghostscript?"; read; if [[ $REPLY == "y" ]]; then gs; else echo "I didn''t think so.";fi'
+  alias gsb='git show-branch'
+  alias grhu='git reset --hard @{u}'
+  alias gwa='git worktree add'
+  alias gwl='git worktree list'
+  alias gwlck='git worktree lock'
+  alias gwmv='git worktree move'
+  alias gwp='git worktree prune'
+  alias gwrm='git worktree remove'
+  alias gwrp='git worktree repair'
+  alias gwu='git worktree unlock'
+#+end_src
+
+*** Global's
+Zsh [[https://zsh.sourceforge.io/Doc/Release/Shell-Grammar.html#Aliasing][Aliases]] can be global, which is cool
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  alias -g G=' | noglob grep'
+  alias -g C=' | column -t'
+  alias -g V=' | vless -'
+  alias -g ...='../..'
+  alias -g ....='../../..'
+  alias -g L='| less'
+  alias -g DN='/dev/null'
+  alias -g A=' | awk'
+  alias -g S=' | sort'
+#+end_src
+
+*** Emacs VTERM
+if we are in EMACS we should alias =clear= so vterm is also aware
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
+      alias clear='vterm_printf "51;Evterm-clear-scrollback";tput clear'
+  fi
+#+end_src
+
+** BindKeys
+Zsh has [[https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Bindable-Commands][Bindable Commands]] which is cool:
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  bindkey '^q' push-line-or-edit
+  bindkey '^s' sudo-command-line
+  bindkey '^h' undo
+#+end_src
+
+** Completion
+ need to use [[https://zsh.sourceforge.io/Doc/Release/Completion-System.html#index-completion-system][Compinit]] to setup completion.
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  autoload -Uz compinit
+  compinit
+#+end_src
+
+** Options
+There are many many many [[https://zsh.sourceforge.io/Doc/Release/Options.html#Options][options]] available in zsh.
+These are for =.zlogin= meaning they can be overridden by =.zshrc= for interactive shells
+#+begin_src bash :tangle ~/.config/zsh/.zlogin
+  setopt appendhistory autocd extendedglob nomatch extendedhistory sharehistory
+  unsetopt beep notify
+  bindkey -v
+  # disbable flow control. It's a fucker.
+  stty stop ""
+#+end_src
+
+** Traps
+He he he I'm so funny
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  ## It's a TRAP
+  if [[ -x =ack ]]; then
+          TRAPINT() {
+                  echo;ack --bar | sed "y/ge/ta/"
+                  return $(( 128 + $1 ))
+          }
+  fi
+#+end_src
+
+** Styles
+[[https://zsh.sourceforge.io/Doc/Release/Zsh-Modules.html#The-zsh_002fzutil-Module][zstyle]] can be configured to show how zsh appears
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  zstyle ':completion:*' auto-description 'Specify %d'
+  zstyle ':completion:*' format 'Completing %d'
+  zstyle ':completion:*' menu select=long-list select=0
+  zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
+  zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+#+end_src
+
+* Antigen
+[[https://github.com/zsh-users/antigen][Antigen]] is a plugin manager for Zsh that provides simple access to Zsh plugins from a variety of sources like [[https://github.com/ohmyzsh/ohmyzsh][OhMyZsh]].
+** Setup
+To use antigen we first need to set up some variables, clone the repo and source the antigen code.
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  export ANTIGEN_CACHE=false
+  antigen_repo=https://github.com/zsh-users/antigen.git
+  antigen_dir=${HOME}/.local/share/antigen-repo
+  [[ -d ${HOME}/.local/share ]] || mkdir -p ${HOME}/.local/share
+  [[ -d ${antigen_dir} ]] || git clone --depth=1 ${antigen_repo} ${antigen_dir}
+  source ${antigen_dir}/antigen.zsh
+  compinit
+#+end_src
+
+**  Plugins
+We need to tell antigen that we want to use Oh my zsh as the default provider:
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  antigen use oh-my-zsh
+#+end_src
+
+Then which plugins we want to use:
+
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  antigen bundles <<EOF
+    aws
+    djui/alias-tips
+    git
+    git-auto-fetch
+    sudo
+    systemd
+    vi-mode
+    zsh-users/zsh-autosuggestions
+    zsh-users/zsh-syntax-highlighting
+  EOF
+#+end_src
+** Theme
+Antigen can also manage themes
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+antigen theme amuse
+#+end_src
+** Apply
+finally we need to tell antigen to apply it's settings
+
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  antigen apply
+#+end_src
+* Vterm
+[[https://github.com/akermu/emacs-libvterm][Vterm]] is a terminal emulator for Emacs that has some nice integrations. However those integrations require some setup in zsh.
+** Vterm Printf
+To help communicate between zsh and vterm this function works.
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  func vterm_printf() {
+    if [ -n "$TMUX" ] && ([ "${TERM%%-*}" = "tmux" ] || [ "${TERM%%-*}" = "screen" ]); then
+        # Tell tmux to pass the escape sequences through
+        printf "\ePtmux;\e\e]%s\007\e\\" "$1"
+    elif [ "${TERM%%-*}" = "screen" ]; then
+        # GNU screen (screen, screen-256color, screen-256color-bce)
+        printf "\eP\e]%s\007\e\\" "$1"
+    else
+        printf "\e]%s\e\\" "$1"
+    fi
+  }
+#+end_src
+
+** Prompt End
+Vterm supports [[https://github.com/akermu/emacs-libvterm#directory-tracking-and-prompt-tracking][Directory and Prompt tracking]] which keeps terminal and Emacs in sync.
+#+begin_src bash :tangle ~/.config/zsh/.zshrc
+  if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
+    vterm_prompt_end() {
+        vterm_printf "51;A$(whoami)@$(hostname):$(pwd)"
+    }
+    setopt PROMPT_SUBST
+    PROMPT=$PROMPT'%{$(vterm_prompt_end)%}'
+  fi
+#+end_src
+* Functions
+The following are functions that are autoloaded by zsh.
+** scratch
+It's nice to be able to quickly switch to a new directory to experiment with stuff, a scratch pad.
+#+begin_src bash :tangle ~/.config/zsh/functions/scratch
+scratchdir=~/area_51/scratch
+
+proj=$1
+
+if [[ ! -d ${scratchdir}/${proj} ]]; then
+	mkdir -p ${scratchdir}/${proj}
+fi
+
+cd ${scratchdir}/${proj}
+#+end_src
+
+We can also set up a completion finction for =scratch=
+#+begin_src bash :tangle ~/.config/zsh/functions/_scratch
+  #compdef scratch
+  scratch_dir=${HOME}/area_51/scratch/
+  scratch_pads=(${scratch_dir}/*(/:t))
+  _values "Scratch projects: " ${scratch_pads}
+#+end_src
+
+
+Usage:
+#+begin_src bash :tangle no
+  scratch name
+#+end_src
+
+Creates a directory =${HOME}/area_51/scratch/name= if it doesn't exist and =cd='s to it.
+Tab complete *should* work.
+** CDR
+Use fuzzy finder to quickly cd into my project directories.
+#+begin_src bash :tangle ~/.config/zsh/functions/cdr
+  cd $(fd --type d --extension .git --exclude scratch --exclude all_repos . ${HOME}/area_51 | fzy)
+#+end_src
+
+** SA
+Search Aliases. For when you can't remember what aliases are doing, or you think you have an alias but can't remember what it is.
+#+begin_src bash :tangle ~/.config/zsh/functions/sa
+    pat="$*"
+    alias | grep -E "$pat"
+#+end_src
+
+** Hist
+Using history is great, but I find the native integration a bit rubbish when trying to search for a history item.
+
+The =fc= [[https://zsh.sourceforge.io/Doc/Release/Shell-Builtin-Commands.html#index-builtin-commands][builtin]] controls the interactive history mechanism. Note that reading and writing of history options
+is only performed if the shell is interactive. Usually this is detected automatically, but it can be forced by setting
+the interactive option when starting the shell.
+
+The following will use =fzy= to present a list of history items which can be fuzzy searched, then executes the selected
+command.
+
+#+begin_src bash :tangle ~/.config/zsh/functions/hist
+  fc -e - $(fc -l -i -r 1 -1 | fzy | awk '{print $1}')
+#+end_src
+
+** Dig
+Just a silly wrapper around =dig=
+#+begin_src bash :tangle ~/.config/zsh/functions/dig
+printf "Can you DIG it?\n"
+
+command dig $@ && printf "\nYes you can!\n" || printf "No sorry you arn't cool enough to dig it.\n"
+#+end_src
