@@ -1,0 +1,92 @@
+#+title: Peteches Git Stuff
+#+PROPERTY: header-args :results silent :mkdirp yes :comments both
+
+
+* Global Ignores
+[[https://github.com/github/gitignore][GitHub Gitignore]] repo has many great gitignore files for all sorts of stuff, so I'm +stealing+ making use of the good effort they have already put in.
+This snippet uses [[https://www.gnu.org/software/emacs/manual/html_node/org/Noweb-Reference-Syntax.html][NoWeb]] to write a babel function that gets the specified gitignore from [[https://github.com/github/gitignore]] 
+#+name: getIgnores
+#+begin_src bash :results output :var ignoreFile="" 
+  echo "# From https://raw.githubusercontent.com/github/gitignore/main/"${ignoreFile}
+  curl -vvv https://raw.githubusercontent.com/github/gitignore/main/${ignoreFile}
+
+  echo -e "\n# end " ${ignoreFile}
+#+end_src
+
+Then our =gitignore= becomes several calls to that function
+#+begin_src conf :noweb yes :tangle ~/.config/git/global_ignore
+  <<getIgnores(ignoreFile="Global/Emacs.gitignore")>>
+  <<getIgnores(ignoreFile="Global/Backup.gitignore")>>
+  <<getIgnores(ignoreFile="Global/Ansible.gitignore")>>
+  <<getIgnores(ignoreFile="Global/Archives.gitignore")>>
+  <<getIgnores(ignoreFile="Global/Diff.gitignore")>>
+  <<getIgnores(ignoreFile="Global/GPG.gitignore")>>
+  <<getIgnores(ignoreFile="Global/Images.gitignore")>>
+  <<getIgnores(ignoreFile="Global/Linux.gitignore")>>
+  <<getIgnores(ignoreFile="Global/Ninja.gitignore")>>
+  <<getIgnores(ignoreFile="Global/Patch.gitignore")>>
+  <<getIgnores(ignoreFile="Global/Tags.gitignore")>>
+  <<getIgnores(ignoreFile="Global/Vim.gitignore")>>
+  <<getIgnores(ignoreFile="Global/VirtualEnv.gitignore")>>
+  <<getIgnores(ignoreFile="Global/macOS.gitignore")>>
+  <<getIgnores(ignoreFile="Autotools.gitignore")>>
+  <<getIgnores(ignoreFile="Elisp.gitignore")>>
+  <<getIgnores(ignoreFile="Go.gitignore")>>
+  <<getIgnores(ignoreFile="Python.gitignore")>>
+  <<getIgnores(ignoreFile="Tex.gitignore")>>
+  <<getIgnores(ignoreFile="Terraform.gitignore")>>
+#+end_src
+
+* Global Config
+There are a lot of [[https://www.git-scm.com/docs/git-config][Git Config]] options.
+** User
+Set some =User= parameters
+#+begin_src conf :tangle ~/.config/git/config
+  [user]
+          name = Pete 'Peteches' McCabe
+          email = pete@peteches.co.uk
+#+end_src
+
+** Core
+These configure the core aspects of Git.
+#+begin_src conf :tangle ~/.config/git/config
+  [core]
+          pager = cat # disable paging
+          editor = /usr/local/bin/emacsclient
+          hooksPath = ~/.config/git/hooks.d
+#+end_src
+
+** Diff
+
+#+begin_src conf :tangle ~/.config/git/config
+  [diff]
+          context = 5
+          algorithm = minimal
+          mnemonicPrefix = true
+
+#+end_src
+
+** Pull
+#+begin_src conf :tangle ~/.config/git/config
+  [pull]
+          ff = true
+          rebase = true
+#+end_src
+
+** Push
+#+begin_src conf :tangle ~/.config/git/config
+  [push]
+          autoSetupRemote = true
+          default = nothing
+
+
+#+end_src
+
+** ReReRe
+#+begin_src conf :tangle ~/.config/git/config
+  [rerere]
+          autoUpdate = true
+          enabled = true
+
+#+end_src
+
