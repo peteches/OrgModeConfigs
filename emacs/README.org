@@ -710,3 +710,23 @@ Need to index mail by running the below:
     )
 
 #+end_src
+
+** GPG
+So I don't use GPG all that much, I probably should though.
+SO here's me trying again, as this should allow me to start using some cool encryption features with Emacs.
+#+begin_src emacs-lisp
+  (use-package epa-file
+    :ensure nil
+    :custom
+    (epg-gpg-program  . "/usr/local/bin/gpg")
+    :config
+    (epa-file-enable))
+#+end_src
+
+*** Mac Support
+Following the [[https://github.com/Homebrew/homebrew-core/issues/14737][Github Issue]] We need to use a different pinentry program specifically for macs:
+#+begin_src bash :tangle no :results silent
+brew install pinentry-mac
+echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
+killall gpg-agent
+#+end_src
