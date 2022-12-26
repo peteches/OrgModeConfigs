@@ -45,6 +45,13 @@ Set some =User= parameters
   [user]
           name = Pete 'Peteches' McCabe
           email = pete@peteches.co.uk
+          signingkey = A6E8150FED0029D7!
+#+end_src
+** Commit
+#+begin_src conf :tangle ~/.config/git/config
+  [commit]
+          gpgSign = true
+
 #+end_src
 
 ** Core

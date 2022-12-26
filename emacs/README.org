@@ -617,6 +617,20 @@ Magit https://magit.vc is a nice git porcelain inside emacs
 #+begin_src emacs-lisp
   (use-package magit)
 #+end_src
+** Pass
+[[https://www.passwordstore.org/][The Unix Password Store]] integrates with emacs out of the box!
+#+begin_src emacs-lisp
+  (use-package auth-source-pass
+  :ensure nil
+  :config
+  (auth-source-pass-enable)
+  )
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package pass)
+
+#+end_src
 
 ** Email
 *** Setup Mail Sync
@@ -626,32 +640,32 @@ brew install isync mu
 #+end_src
 
 **** Create mbsync config
-First need to sync mail, Using mb sync, RC Config example:
+First need to sync mail, Using mb sync, RC Config example
 #+begin_src conf :tangle ~/.mbsyncrc :results nil
-    IMAPAccount fastmail
-    Host imap.fastmail.com
-    User pete@peteches.co.uk
-    UseKeychain yes
-    SSLType IMAPS
-    AuthMechs LOGIN
+  IMAPAccount fastmail
+  Host imap.fastmail.com
+  User pete@peteches.co.uk
+  PassCmd "pass imap.fastmail.com:993/pete@peteches.co.uk"
+  SSLType IMAPS
+  AuthMechs LOGIN
 
-    IMAPStore fastmail-remote
-    Account fastmail
+  IMAPStore fastmail-remote
+  Account fastmail
 
-    MaildirStore fastmail-local
-    Subfolders Verbatim
-    Path ~/Mail/peteches.co.uk/
-    Inbox ~/Mail/peteches.co.uk/enbox
+  MaildirStore fastmail-local
+  Subfolders Verbatim
+  Path ~/Mail/peteches.co.uk/
+  Inbox ~/Mail/peteches.co.uk/Inbox
 
-    Channel fastmail
-    Far :fastmail-remote:
-    Near :fastmail-local:
-    Patterns * !Inbox/L1
-    Expunge None
-    CopyArrivalDate yes
-    Sync All
-    Create Both
-    SyncState *
+  Channel fastmail
+  Far :fastmail-remote:
+  Near :fastmail-local:
+  Patterns * !Inbox/L1
+  Expunge None
+  CopyArrivalDate yes
+  Sync All
+  Create Both
+  SyncState *
 #+end_src
 
 ****  Run initial sync
@@ -693,7 +707,13 @@ Need to index mail by running the below:
                               (string-prefix-p "/peteches.co.uk" (mu4e-message-field msg :maildir))))
                           :vars '(
                                   (user-full-name . "Pete McCabe")
+                                  (user-email-address . "pete@peteches.co.uk")
 
+                                  (message-send-mail-function . smtpmail-send-it)
+                                  (smtpmail-smtp-user . "pete@peteches.co.uk")
+                                  (smtpmail-smtp-server  . "smtp.fastmail.com")
+                                  (smtpmail-smtp-service . 465)
+                                  (smtpmail-stream-type  . ssl)
                                   (mu4e-drafts-folder . "/peteches.co.uk/Drafts")
                                   (mu4e-sent-folder . "/peteches.co.uk/Sent")
                                   (mu4e-refile-folder . "/peteches.co.uk/Archive")
@@ -709,24 +729,4 @@ Need to index mail by running the below:
     (mu4e t)
     )
 
-#+end_src
-
-** GPG
-So I don't use GPG all that much, I probably should though.
-SO here's me trying again, as this should allow me to start using some cool encryption features with Emacs.
-#+begin_src emacs-lisp
-  (use-package epa-file
-    :ensure nil
-    :custom
-    (epg-gpg-program  . "/usr/local/bin/gpg")
-    :config
-    (epa-file-enable))
-#+end_src
-
-*** Mac Support
-Following the [[https://github.com/Homebrew/homebrew-core/issues/14737][Github Issue]] We need to use a different pinentry program specifically for macs:
-#+begin_src bash :tangle no :results silent
-brew install pinentry-mac
-echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
-killall gpg-agent
 #+end_src
