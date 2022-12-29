@@ -822,3 +822,9 @@ Need to index mail by running the below:
     ;; Add the close emacs hook
     (add-hook 'kill-emacs-hook 'org-caldav-sync-at-close))
 #+end_src
+
+** BugTracker
+Emacs has a bug tracking package! how cool!
+#+begin_src emacs-lisp
+(use-package debbugs)
+#+end_src
