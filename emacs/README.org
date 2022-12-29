@@ -712,7 +712,7 @@ Then sync mail by running:
 
 **** Index mail
 Need to index mail by running the below:
-#+begin_src bash :tabgle no :results none
+#+begin_src bash :tangle no :results none
   /usr/local/bin/mu init --mu-home ~/Mail/.mu-cache -m ~/Mail/ "--my-address=/.*@peteches.co.uk$/"
   /usr/local/bin/mu index --mu-home ~/Mail/.mu-cache
 #+end_src
