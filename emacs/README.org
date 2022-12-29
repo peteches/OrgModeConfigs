@@ -315,6 +315,38 @@ Not sure why just yet but this hook seems to stop evil-mode working everywhere.
   (evil-collection-init))
 #+end_src
 
+**** Evil Lion
+[[https://github.com/edkolev/evil-lion][evil lion]] is a text alignment plugin, it looks cool so I'm giving it a go.
+#+begin_src emacs-lisp
+  (use-package evil-lion
+    :config
+    (evil-lion-mode))
+#+end_src
+
+**** Evil Surround
+[[https://github.com/emacs-evil/evil-surround][evil surround]] is a port of Tim Pope's surround plugin. I used it extensively in my vimming days and I miss it!
+#+begin_src emacs-lisp
+  (use-package evil-surround
+  :config
+  (global-evil-surround-mode 1))
+#+end_src
+
+**** Evil commentary
+[[https://github.com/linktohack/evil-commentary][Evil commentary]] is a port of Tim Pope's vim-commentart plugin. I used it a lot and want it in emacs.
+#+begin_src emacs-lisp
+  (use-package evil-commentary
+    :config
+    (evil-commentary-mode 1))
+#+end_src
+
+**** Evil Exchange
+[[https://github.com/Dewdrops/evil-exchange][evil exchange]] is  a port of Tom McDonald's vim-exchange, though the default binding has to be changed from =cx= to =gx= for reasons.
+#+begin_src emacs-lisp
+  (use-package evil-exchange
+  :config
+  (evil-exchange-install))
+#+end_src
+
 ** Language Support
 *** Globally useful
 **** Flycheck
