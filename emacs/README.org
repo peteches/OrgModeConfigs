@@ -724,7 +724,8 @@ Need to index mail by running the below:
     :ensure nil
     :load-path "/usr/local/Cellar/mu/1.8.13/share/emacs/site-lisp/mu/mu4e"
     :config
-    (setq mu4e-change-filenames-when-moving t
+    (setq mail-user-agent 'mu4e-user-agent
+          mu4e-change-filenames-when-moving t
           mu4e-update-interval (* 10 60)
           mu4e-get-mail-command "/usr/local/bin/mbsync -a"
           mu4e-maildir "~/Mail"
@@ -742,7 +743,7 @@ Need to index mail by running the below:
                               (string-prefix-p "/peteches.co.uk" (mu4e-message-field msg :maildir))))
                           :vars '(
                                   (user-full-name . "Pete McCabe")
-                                  (user-email-address . "pete@peteches.co.uk")
+                                  (user-mail-address . "pete@peteches.co.uk")
 
                                   (message-send-mail-function . smtpmail-send-it)
                                   (smtpmail-smtp-user . "pete@peteches.co.uk")
@@ -753,6 +754,14 @@ Need to index mail by running the below:
                                   (mu4e-sent-folder . "/peteches.co.uk/Sent")
                                   (mu4e-refile-folder . "/peteches.co.uk/Archive")
                                   (mu4e-trash-folder . "/peteches.co.uk/Bin")
+                                  (org-msg-signature . "
+
+  Regards,
+
+  ,#+begin_signature
+  --
+  ,*Pete*
+  ,#+end_signature")
                                   ))
                          )
 
@@ -764,6 +773,21 @@ Need to index mail by running the below:
     (mu4e t)
     )
 
+#+end_src
+**** Install OrgMsg
+[[https://github.com/jeremy-compostella/org-msg][Org-msg]] is an emacs minor mode for composing email. It harnesses some org-mode things.
+#+begin_src emacs-lisp
+  (use-package org-msg
+    :config
+    (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
+          org-msg-startup "hidestars indent inlineimages"
+          org-msg-greeting-fmt "\nHi%s,\n\n"
+          org-msg-greeting-name-limit 3
+          org-msg-default-alternatives '((new		. (text html))
+                                         (reply-to-html	. (text html))
+                                         (reply-to-text	. (text)))
+          org-msg-convert-citation t)
+    (org-msg-mode))
 #+end_src
 
 ** Calendar
