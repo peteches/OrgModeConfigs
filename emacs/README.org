@@ -124,7 +124,7 @@ On fist use on after the package is installed you need to run
     :commands (dired dired-jump)
     :config
     (if (executable-find "exa")
-        (setq insert-directory-program "/usr/local/bin/exa"))
+        (setq insert-directory-program (executable-find "exa")))
     :custom
     ((dired-dwim-target t)
      (dired-hide-details-hide-symlink-targets t)
