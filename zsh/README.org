@@ -1,12 +1,12 @@
 #+title: Peteches Zsh Stuff
-#+PROPERTY: header-args :results silent :mkdirp yes 
+#+PROPERTY: header-args :results silent :mkdirp yes
 
 Zsh is my prefered terminal. Docs: [[https://zsh.sourceforge.io/Doc/Release/zsh_toc.html][on sourceforge]]
 * Useful info
 
 ** Startup
 Zsh reads different [[https://zsh.sourceforge.io/Doc/Release/Files.html#Files-1][startup files]] depending on how it's invoked.
-=ZDOTDIR= is the directory to search for shell startup files (.zshrc, etc), if not $HOME.  
+=ZDOTDIR= is the directory to search for shell startup files (.zshrc, etc), if not $HOME.
 * .zshenv
 
 =/etc/zshenv= is always the first file to be sourced, this cannot be changed and so should be minimal. After the global =/etc/zshenv= is read next is =${ZDOTDIR}/.zshenv=
@@ -16,6 +16,8 @@ We want to keep all config as much as possible in =XDG= places so keep a minimal
 #+begin_src bash :tangle ~/.zshenv
   export ZDOTDIR=${HOME}/.config/zsh
   if { guix --help >/dev/null 2>&1; }; then ## add guix path
+
+  fi
   source ${ZDOTDIR}/.zshenv
 #+end_src
 
@@ -78,7 +80,7 @@ export cdpath
 :PROPERTIES:
 :header-args: :tangle ~/.config/zsh/.zprofile
 :END:
-If the shell is a login shell, commands are read from =/etc/zprofile= and then =$ZDOTDIR/.zprofile=. 
+If the shell is a login shell, commands are read from =/etc/zprofile= and then =$ZDOTDIR/.zprofile=.
 ** Tag
 Just set some env vars to be able to keep track of which shells are which:
 #+begin_src bash
@@ -86,12 +88,12 @@ ZPROFILE=true
 #+end_src
 * .zshrc
 :PROPERTIES:
-:header-args: :tangle ~/.config/zsh/.zshrc 
+:header-args: :tangle ~/.config/zsh/.zshrc
 :END:
-If the shell is interactive commands are read from =/etc/zshrc= and then =${ZDOTDIR}/.zshrc= 
+If the shell is interactive commands are read from =/etc/zshrc= and then =${ZDOTDIR}/.zshrc=
 ** Tag
 Just set some env vars to be able to keep track of which shells are which:
-#+begin_src bash 
+#+begin_src bash
 ZSHRC=true
 #+end_src
 
@@ -126,7 +128,7 @@ if { git --help >/dev/null 2>&1; }; then
 #+end_src
 **** Setup
 To use antigen we first need to set up some variables, clone the repo and source the antigen code.
-#+begin_src bash 
+#+begin_src bash
       export ANTIGEN_CACHE=false
       antigen_repo=https://github.com/zsh-users/antigen.git
       antigen_dir=${HOME}/.local/share/antigen-repo
@@ -136,7 +138,7 @@ To use antigen we first need to set up some variables, clone the repo and source
 #+end_src
 **** Completion
  need to use [[https://zsh.sourceforge.io/Doc/Release/Completion-System.html#index-completion-system][Compinit]] to setup completion.
-#+begin_src bash 
+#+begin_src bash
   autoload -Uz compinit
   compinit
 #+end_src
@@ -144,13 +146,13 @@ To use antigen we first need to set up some variables, clone the repo and source
 
 ****  Plugins
 We need to tell antigen that we want to use Oh my zsh as the default provider:
-#+begin_src bash 
+#+begin_src bash
       antigen use oh-my-zsh
 #+end_src
 
 Then which plugins we want to use:
 
-#+begin_src bash 
+#+begin_src bash
       antigen bundles <<EOF
         aws
         djui/alias-tips
@@ -165,13 +167,13 @@ Then which plugins we want to use:
 #+end_src
 **** Theme
 Antigen can also manage themes
-#+begin_src bash 
+#+begin_src bash
     antigen theme amuse
 #+end_src
 **** Apply
 finally we need to tell antigen to apply it's settings
 
-#+begin_src bash 
+#+begin_src bash
       antigen apply
 #+end_src
 *** End if
@@ -186,7 +188,7 @@ Aliases are super useful and I like making theme
 
 *** LS
 So =ls= is fine an all, but I really quite like [[https://the.exa.website/][exa]], but apparenly my muscle memory isn't catching up!
-#+begin_src bash 
+#+begin_src bash
   if { exa --help >/dev/null 2>&1; }; then
       alias ll='exa --all --header --long --classify --git'
       alias la='exa --all --git'
@@ -200,13 +202,13 @@ So =ls= is fine an all, but I really quite like [[https://the.exa.website/][exa]
 
 *** Sudo
 Almost pointless, but this alias ensures that any =sudo='ed commands get scanned for aliases too
-#+begin_src bash 
+#+begin_src bash
   alias sudo='sudo '
 #+end_src
 
 *** Animations
 This is just a bit of fun really.
-#+begin_src bash 
+#+begin_src bash
   alias door='clear;x=$(($COLUMNS/2));y=$(($LINES/2));c=0;n=1;a=90;while :;do bgc=$(($c%232 + 16));case "$a" in 0)xd=0;yd=-1;n=$(($n+1));; 90)xd=1;yd=0;; 180)xd=0;yd=1;n=$(($n+1));; 270)xd=-1;yd=0 ;; *) break ;; esac; for ((i=0;i < $n;i++));do if [[ $x -ge $COLUMNS || $x -le 0 || $y -ge $LINES || $y -le 0 ]]; then x=$(($COLUMNS/2));y=$(($LINES/2));n=1;a=0; continue ; fi ; printf "\033[%s;%sH\033[48;5;%sm \033[0m" $y $x $bgc ; x=$(( $x + $xd )); y=$(( $y + $yd )); done ; c=$(( $c + 1 )); a=$(( $(( $a + 90 )) % 360 )) ; sleep 0.001; done'
   alias worm='a=1;x=1;y=1;xd=1;yd=1;while true;do if [[ $x == $LINES || $x == 0 ]]; then xd=$(( $xd *-1 )) ; fi ; if [[ $y == $COLUMNS || $y == 0 ]]; then yd=$(( $yd * -1 )) ; fi ; x=$(( $x + $xd )); y=$(( $y + $yd )); printf "\33[%s;%sH\33[48;5;%sm \33[0m" $x $y $(($a%199+16)) ;a=$(( $a + 1 )) ; sleep 0.001 ;done'
   alias snow='clear;while :;do echo $LINES $COLUMNS $(($RANDOM%$COLUMNS)) $(printf "\u2743\n");sleep 0.1;done|gawk '\''{a[$3]=0;for(x in a) {o=a[x];a[x]=a[x]+1;printf "\033[%s;%sH ",o,x;printf "\033[%s;%sH%s \033[0;0H",a[x],x,$4;}}'\'''
@@ -215,7 +217,7 @@ This is just a bit of fun really.
 *** Git
 Git alias are OK, but not nearly as good as shell aliases.
 
-#+begin_src bash 
+#+begin_src bash
   alias gma='git merge --abort'
   alias gmnff='git merge --no-ff'
   alias gs='echo "Did you really mean to invoke ghostscript?"; read; if [[ $REPLY == "y" ]]; then gs; else echo "I didn''t think so.";fi'
@@ -233,7 +235,7 @@ Git alias are OK, but not nearly as good as shell aliases.
 
 *** Global's
 Zsh [[https://zsh.sourceforge.io/Doc/Release/Shell-Grammar.html#Aliasing][Aliases]] can be global, which is cool
-#+begin_src bash 
+#+begin_src bash
   alias -g G=' | noglob grep'
   alias -g C=' | column -t'
   alias -g V=' | vless -'
@@ -247,7 +249,7 @@ Zsh [[https://zsh.sourceforge.io/Doc/Release/Shell-Grammar.html#Aliasing][Aliase
 
 *** Emacs VTERM
 if we are in EMACS we should alias =clear= so vterm is also aware
-#+begin_src bash 
+#+begin_src bash
   if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
       alias clear='vterm_printf "51;Evterm-clear-scrollback";tput clear'
   fi
@@ -255,7 +257,7 @@ if we are in EMACS we should alias =clear= so vterm is also aware
 
 ** BindKeys
 Zsh has [[https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Bindable-Commands][Bindable Commands]] which is cool:
-#+begin_src bash 
+#+begin_src bash
   bindkey '^q' push-line-or-edit
   bindkey '^s' sudo-command-line
   bindkey '^h' undo
@@ -263,7 +265,7 @@ Zsh has [[https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Bindable
 
 ** Traps
 He he he I'm so funny
-#+begin_src bash 
+#+begin_src bash
   ## It's a TRAP
   if { ack --help >/dev/null 2>&1; }; then
           TRAPINT() {
@@ -277,7 +279,7 @@ He he he I'm so funny
 
 ** Styles
 [[https://zsh.sourceforge.io/Doc/Release/Zsh-Modules.html#The-zsh_002fzutil-Module][zstyle]] can be configured to show how zsh appears
-#+begin_src bash 
+#+begin_src bash
   zstyle ':completion:*' auto-description 'Specify %d'
   zstyle ':completion:*' format 'Completing %d'
   zstyle ':completion:*' menu select=long-list select=0
@@ -289,7 +291,7 @@ He he he I'm so funny
 [[https://github.com/akermu/emacs-libvterm][Vterm]] is a terminal emulator for Emacs that has some nice integrations. However those integrations require some setup in zsh.
 *** Vterm Printf
 To help communicate between zsh and vterm this function works.
-#+begin_src bash 
+#+begin_src bash
   func vterm_printf() {
     if [ -n "$TMUX" ] && ([ "${TERM%%-*}" = "tmux" ] || [ "${TERM%%-*}" = "screen" ]); then
         # Tell tmux to pass the escape sequences through
@@ -305,7 +307,7 @@ To help communicate between zsh and vterm this function works.
 
 *** Prompt End
 Vterm supports [[https://github.com/akermu/emacs-libvterm#directory-tracking-and-prompt-tracking][Directory and Prompt tracking]] which keeps terminal and Emacs in sync.
-#+begin_src bash 
+#+begin_src bash
   if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
     vterm_prompt_end() {
         vterm_printf "51;A$(whoami)@$(hostname):$(pwd)"
@@ -328,7 +330,7 @@ These are for =.zlogin= meaning they can't be overridden by =.zshrc= for interac
 
 * .zlogin
 :PROPERTIES:
-:header-args: :tangle ~/.config/zsh/.zlogin 
+:header-args: :tangle ~/.config/zsh/.zlogin
 :END:
 Finally if the shell is a login shell =/etc/zlogin= and =${ZDOTDIR}/.zlogin= are read.
 This allows login shells to optionally override some settings meant for interactive shells set in =zshrc= files.
