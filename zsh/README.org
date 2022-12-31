@@ -15,9 +15,6 @@ Zsh reads different [[https://zsh.sourceforge.io/Doc/Release/Files.html#Files-1]
 We want to keep all config as much as possible in =XDG= places so keep a minimal =${HOME}/.zshenv= that repoints =ZDOTDIR= to =${HOME}/.config/zsh=
 #+begin_src bash :tangle ~/.zshenv
   export ZDOTDIR=${HOME}/.config/zsh
-  if { guix --help >/dev/null 2>&1; }; then ## add guix path
-
-  fi
   source ${ZDOTDIR}/.zshenv
 #+end_src
 
