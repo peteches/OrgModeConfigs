@@ -120,16 +120,17 @@ On fist use on after the package is installed you need to run
 
 #+begin_src emacs-lisp
   (use-package dired
-    ; dired is not installable as it's builtin
-  :ensure nil
-  :commands (dired dired-jump)
-  :config
-  (setq insert-directory-program "/usr/local/bin/exa")
-  :custom
-  ((dired-dwim-target t)
-   (dired-hide-details-hide-symlink-targets t)
-   (directory-listing-before-filename-regexp "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] \\([01][0-9]\\|2[0-3]\\):[0-5][0-9] +")
-   (dired-listing-switches "--classify --long --all --sort=Name --group-directories-first --time-style=long-iso --no-user")))
+    :ensure nil ; dired is not installable as it's builtin
+    :commands (dired dired-jump)
+    :config
+    (if (executable-find "exa")
+        (setq insert-directory-program "/usr/local/bin/exa"))
+    :custom
+    ((dired-dwim-target t)
+     (dired-hide-details-hide-symlink-targets t)
+     (if (executable-find "exa")
+         (directory-listing-before-filename-regexp "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] \\([01][0-9]\\|2[0-3]\\):[0-5][0-9] +")
+         (dired-listing-switches "--classify --long --all --sort=Name --group-directories-first --time-style=long-iso --no-user"))))
 #+end_src
 
 **** Fancy Icons
