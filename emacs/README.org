@@ -26,6 +26,25 @@ These will be needed for most of the rest of the config so best set it up first.
   (setq use-package-always-ensure t)
 #+end_src
 
+*** Function to determine platform
+
+Throughout this config I'll need to make descisions based on if it's being used on linux or mac.
+#+begin_src emacs-lisp
+
+  (defmacro peteches/sys-exe (type &rest body)
+    "Evaluate BODY if `system-type' equals TYPE."
+    (declare (indent defun))
+    `(when (eq system-type ',type)
+       ,@body))
+ #+end_src
+
+#+begin_src emacs-lisp
+  (peteches/sys-exe gnu/linux
+    (message "free beer"))
+  (peteches/sys-exe darwin
+    (message "Expensive phone"))
+#+end_src
+
 *** Tidy up some UI elements
 **** fix ugly old school defaults for a minimal look
 #+begin_src emacs-lisp
@@ -120,8 +139,11 @@ On fist use on after the package is installed you need to run
 #+end_src
 
 *** Configure Fonts
-#+begin_src emacs-lisp
-  (set-face-attribute 'default nil :font "Menlo" :height 110)
+#+begin_src emacs-lisp 
+  (peteches/sys-exe gnu/linux
+                     (set-face-attribute 'default nil :font "DejaVu Sans Mono" :height 220))
+  (peteches/sys-exe darwin
+                    (set-face-attribute 'default nil :font "Menlo" :height 110))
 #+end_src
 
 
@@ -464,9 +486,14 @@ The [[https://gitlab.com/jabranham/mixed-pitch][mixed pitch package]], by Alex B
   (use-package mixed-pitch
   :hook (text-mode . mixed-pitch-mode)
   :config
-  (set-face-attribute 'default nil :font "PT Mono" :height 130)
-  (set-face-attribute 'fixed-pitch nil :font "PT Mono")
-  (set-face-attribute 'variable-pitch nil :font "Georgia"))
+  (peteches/sys-exe darwin (
+                              (set-face-attribute 'default nil :font "PT Mono" :height 130)
+                              (set-face-attribute 'fixed-pitch nil :font "PT Mono")
+                              (set-face-attribute variable-pitch nil :font "Georgia")))
+  (peteches/sys-exe "gnu/linux" (
+                                 (set-face-attribute default nil :font "DejaVu Sans Mono" :height 230)
+                                 (set-face-attribute 'fixed-pitch nil :font "DejaVu Sans Mono")
+                                 (set-face-attribute 'variable-pitch nil :font "Cantarell"))))
   (add-hook 'mixed-pitch-mode #'solaire-mode-reset)
 #+end_src
 **** Use a postframe for company mode
