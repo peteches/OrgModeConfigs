@@ -467,7 +467,11 @@ Org is installed by default, but this makes sure we're on the latest version. Al
           org-agenda-files '(
                              "~/org/Tasks.org"
                              )
-          org-image-actual-width '(900)))
+          org-image-actual-width '(900))
+    )
+  (dolist (ele org-agenda-files)
+    (make-directory (file-name-directory ele)))
+
 #+end_src
 
 **** Nice Bullets
@@ -798,6 +802,19 @@ Need to index mail by running the below:
             ("/peteches.co.uk/Sent"      . ?s)
             ("/peteches.co.uk/Drafts"    . ?d)
             ("/peteches.co.uk/Bin"       . ?b)))
+
+    (dolist (ele '(
+                 "peteches.co.uk/Archive"
+                 "peteches.co.uk/Bin"
+                 "peteches.co.uk/Drafts"
+                 "peteches.co.uk/Inbox"
+                 "peteches.co.uk/Sent"
+                 "peteches.co.uk/Spam"
+                 "peteches.co.uk/Trash"
+                 "peteches.co.uk/test"
+                  ))
+      (make-directory (expand-file-name ele "~/Mail") "true"))
+
     (mu4e t)
     )
 
@@ -842,11 +859,13 @@ Need to index mail by running the below:
             (run-with-idle-timer
              (* 1 secs) nil 'org-caldav-sync)))
 
+
+    (make-directory "~/Calendars/backups" "true")
     ;; Actual calendar configuration edit this to meet your specific needs
     (setq
      org-caldav-debug-level 2
-          org-caldav-backup-file "~/org-caldav/org-caldav-backup.org"
-          org-caldav-save-directory "~/org-caldav/")
+          org-caldav-backup-file "~/Calendars/backups/org-caldav-backup.org"
+          org-caldav-save-directory "~/Calendars/backups/")
 
     (setq org-caldav-calendars nil)
     (add-to-list 'org-caldav-calendars
