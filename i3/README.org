@@ -1,0 +1,212 @@
+#+title: Peteches i3wm Stuff
+
+[[https://i3wm.org/docs/userguide.html][i3wm]] is a tiling window manager for linux / X11. It's Ace!
+
+* Dependencies
+- maim Screenshot tool
+- xbacklight brightness controller
+- playerctl media controller
+- Rofi dmenu alternative job runner
+- jq json query tool
+- xsetroot setting background
+- polybar a status bar
+- polybar themes git repo with polybar setups.
+
+** Install for Gentoo
+#+begin_src bash :tangle no
+  euse -E -p x11-misc/rofi drun windowmode
+  euse -E -p x11-misc/picuom dbus opengl
+  euse -E -p x11-misc/polybar alsa curl i3wm ipc mpd network pulseaudio
+  emerge media-gfx/maim x11-apps/xsetroot x11-apps/xbacklight media-sound/playerctl app-misc/jq x11-misc/picom x11-misc/xautolock x11-misc/numlockx x11-misc/polybar x11-misc/rofi
+
+  tmpdir=$(mktemp -d)
+  git clone --depth=1 https://github.com/adi1090x/polybar-themes.git ${tmpdir}
+  bash ${tmpdir}/setup.sh <<< "2"
+
+#+end_src
+
+#+RESULTS:
+
+* Config
+:PROPERTIES:
+:header-args: :results silent :mkdirp yes :tangle ~/.config/i3/config
+:END:
+** Set Meta as the modifier key
+
+#+begin_src conf
+  set $mod Mod4
+#+end_src
+** Font
+#+begin_src conf
+  font pango:Inconsolata Nerd Font Complete Mono 8
+#+end_src
+** Workspace back and forth
+Allows to switch workspaces using the same shortcut used to arrive at the current workspace [[https://i3wm.org/docs/userguide.html#workspace_auto_back_and_forth][doc]]
+#+begin_src conf
+  workspace_auto_back_and_forth yes
+#+end_src
+** Floating windows
+whilst i3wm focuses on tiled windows occasionally it's useful to have some floating around  so lets manage that here.
+#+begin_src conf
+  floating_modifier $mod
+  bindsym $mod+Shift+f floating toggle
+#+end_src
+** Some misc shortcuts
+#+begin_src conf
+  bindsym XF86MonBrightnessUp exec xbacklight -inc 10
+  bindsym XF85MonBrightnessDown exec xbacklight -dec 10
+  bindsym Print --release exec "maim --hidecursor --select ~/Pictures/screenshots/$(date +%s).png"
+  bindsym XF86AudioPlay exec playerctl play-pause
+  bindsym XF86AudioPause exec playerctl play-pause
+  bindsym $mod+Return exec alacritty
+  bindsym $mod+Shift+q kill
+#+end_src
+** Rofi shortcuts
+#+begin_src conf :tangle ~/.config/rofi/config.rasi
+          configuration {
+	modi: "run";
+	terminal: "alacritty";
+
+}
+
+#+end_src
+
+#+begin_src bash :tangle ~/.config/rofi/workspaces.sh :shebang #!/bin/bash
+
+  if [[ $# -eq 0 ]]; then
+          i3-msg -t get_workspaces | jq '.[]|.name'
+  else
+          i3-msg workspace $@ >/dev/null
+  fi
+
+#+end_src
+
+#+begin_src conf
+  bindsym $mod+d exec rofi -modi run -show run
+  bindsym $mod+w exec rofi -modi workspace:${HOME}/.config/rofi/workspaces.sh -show workspace
+#+end_src
+** Focusing
+#+begin_src conf
+  bindsym $mod+a focus parent
+          bindsym $mod+space focus mode_toggle
+          bindsym $mod+h focus left
+          bindsym $mod+j focus down
+          bindsym $mod+k focus up
+          bindsym $mod+l focus right
+
+          bindsym $mod+Tab workspace next_on_output
+          bindsym $mod+Shift+Tab workspace prev_on_output
+
+
+#+end_src
+** Movements
+#+begin_src conf
+  bindsym $mod+Shift+h move container left
+          bindsym $mod+Shift+j move container down
+          bindsym $mod+Shift+k move container up
+          bindsym $mod+Shift+l move container right
+          bindsym $mod+Control+h move output left
+          bindsym $mod+Control+j move output down
+          bindsym $mod+Control+k move output up
+          bindsym $mod+Control+l move output right
+#+end_src
+** Layout
+#+begin_src conf
+  bindsym $mod+t split toggle
+  bindsym $mod+f fullscreen toggle
+
+  bindsym $mod+s layout stacking
+  bindsym $mod+e layout toggle split
+
+#+end_src
+** Workspace setup
+*** Define dedicated workspaces
+#+begin_src conf
+  set $www "www"
+    set $comms "comms"
+    set $music "music"
+#+end_src
+*** Scratchpad
+#+begin_src conf
+  bindsym $mod+minus scratchpad show
+          bindsym $mod+Shift+minus move scratchpad
+
+#+end_src
+*** Workspace assignments
+#+begin_src conf
+  assign [class="Slack"] workspace $comms
+         assign [class="Spotify"] move scratchpad
+#+end_src
+** Reload / restart i3wm
+#+begin_src conf
+  bindsym $mod+Shift+c reload
+          bindsym $mod+Shift+r restart
+#+end_src
+** Resizing floating windows
+#+begin_src conf
+  mode "resize" {
+        # These bindings trigger as soon as you enter the resize mode
+
+        # Pressing left will shrink the window’s width.
+        # Pressing right will grow the window’s width.
+        # Pressing up will shrink the window’s height.
+        # Pressing down will grow the window’s height.
+        bindsym h resize shrink width 10 px or 10 ppt
+        bindsym j resize grow height 10 px or 10 ppt
+        bindsym k resize shrink height 10 px or 10 ppt
+        bindsym l resize grow width 10 px or 10 ppt
+
+        # same bindings, but for the arrow keys
+        bindsym Left resize shrink width 10 px or 10 ppt
+        bindsym Down resize grow height 10 px or 10 ppt
+        bindsym Up resize shrink height 10 px or 10 ppt
+        bindsym Right resize grow width 10 px or 10 ppt
+
+        # back to normal: Enter or Escape or $mod+r
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym $mod+r mode "default"
+  }
+          bindsym $mod+Control+r mode "resize"
+#+end_src
+** Theme Stuff
+#+begin_src conf
+          hide_edge_borders both
+
+set_from_resource  $bgcolor            i3wm.background #2f343f
+set_from_resource  $textcolor          i3wm.foreground #f3f4f5
+set_from_resource  $inactivebgcolor    i3wm.color0 #2f343f
+set_from_resource  $inactivetextcolor  i3wm.color8 #676e7d
+set_from_resource  $urgentbgcolor      i3wm.color7 #e53935
+set_from_resource  $urgenttextcolor    i3wm.color1 #fff4f5
+
+# window colours
+#                        border              background          text                  indicator
+client.focused           $bgcolor           $bgcolor           $textcolor           #00ff00
+client.unfocused         $inactivebgcolor  $inactivebgcolor  $inactivetextcolor  #00ff00
+client.focused_inactive  $inactivebgcolor  $inactivebgcolor  $inactivetextcolor  #00ff00
+client.urgent            $urgentbgcolor    $urgentbgcolor    $textcolor           #00ff00
+
+#+end_src
+** Startup
+*** Config
+#+begin_src conf
+  exec --no-startup-id dunst
+  exec  --no-startup-id picom --daemon
+  exec --no-startup-id  numlockx on
+  exec --no-startup-id  xautolock -detectsleep -time 10 -locker 'i3lock-extra -m pixelize --pixelize-scale 20' -notify 30 -notifier 'notify-send -u critical -t 10000 -- "locking screen in 30 seconds"'
+  exec  --no-startup-id xsetroot -solid "#999999"
+  exec --no-startup-id ~/.local/bin/polybar.sh
+#+end_src
+*** Create the polybar startup script
+#+begin_src bash :shebang #!/bin/bash :tangle ~/.local/bin/polybar.sh
+
+  killall -q polybar
+
+  while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done
+
+  for x in $(polybar --list-monitors | cut -d: -f1); do
+      MONITOR=${x} polybar -q main -c ~/.config/polybar/forest/config.ini &
+  done
+
+#+end_src
