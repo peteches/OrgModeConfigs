@@ -20,6 +20,11 @@ We want to keep all config as much as possible in =XDG= places so keep a minimal
   export ZDOTDIR=${HOME}/.config/zsh
   source ${ZDOTDIR}/.zshenv
 #+end_src
+*** Source global profile
+A lot of systems have important startup code in =/etc/profile= so lets source that.
+#+begin_src bash :tangle ~/.j
+source /etc/profile
+#+end_src
 
 *** PATH
 [[https://zsh.sourceforge.io/Doc/Release/Parameters.html#index-PATH][PATH]] is a colon seperated list of directories to search when running commands
@@ -42,7 +47,9 @@ Deriving =PATH= from =path_dirs= may seem awkward, but it lets me lay out hte pa
           ${HOME}/.guix_profile/bin
       )
   fi
-  export PATH=${(pj":")path_dirs[@]}:${PATH}
+  TMP_PATH=${(pj":")path_dirs[@]}:${PATH}
+  export PATH=${TMP_PATH}
+
 #+end_src
 *** Editor
 Lets setup emacsclient as our editor of choice
@@ -99,14 +106,9 @@ If the shell is interactive commands are read from =/etc/zshrc= and then =${ZDOT
 ** Tag
 Just set some env vars to be able to keep track of which shells are which:
 #+begin_src bash
-ZSHRC=true
+  ZSHRC=true
 #+end_src
 
-** Source global profile
-A lot of systems have important startup code in =/etc/profile= so lets source that.
-#+begin_src bash
-source /etc/profile
-#+end_src
 
 ** Autoloading
 Zsh supports lazy loading functions, via [[https://zsh.sourceforge.io/Doc/Release/Functions.html#index-functions_002c-autoloading][autoloading]]. This saves time during zsh startup so functions are only loaded when used.
