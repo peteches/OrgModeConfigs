@@ -1,0 +1,614 @@
+#+title: Peteches Vimb Stuff
+#+PROPERTY: header-args:conf :tangle ~/.config/vimb/config
+#+PROPERTY: header-args :results silent :mkdirp yes
+
+[[https://fanglingsu.github.io/vimb/man.html][vimb]] is a modal web browser based on vim, as the name suggests VimBrowser!
+
+* Useful tools
+As Vimb doesn't support, or at least poorly supports, media integration, which is a plus imo, I use [[https://mpv.io][mpv]] and [[https://github.com/yt-dlp/yt-dlp][yt-dlp]] and set the =x-hint-command= to use them.
+#+begin_src bash
+emerge media-video/mpv net-misc/yt-dlp media-libs/gst-plugins-ugly
+#+end_src
+* Settings
+Settings control how the browser works. The defaults are loaded from =${XDG_HOME}/vimb/config= or =${XDG_HOME}/vimb/<PROFILE>/config= if using the ~-p <PROFILE~ commandline option.
+
+Settings can also be controled from the command mode within vimb.
+Set configuration values named by var. To set boolean variable you should use =on=, =off= or =true= and =false=. Colors are given as hexadecimal value like =#f57700=.
+~:se[t] var=value~
+Add the value to a number option, or apend the value to a string option. When the option is a comma separated list, a comma is added, unless the value was empty.
+~:se[t] var+=value~
+Multiply the value to a number option, or prepend the value to a string option. When the option is a comma separated list, a comma is added, unless the value was empty.
+~:set[t] var^=value~
+Subtract the value from a number option, or remove the value from a string option, if it is there. When the option is a comma separated list, a comma is deleted, unless the option becomes empty.
+~:se[t] var-=value~
+Show the current set value of variable var.
+~:se[t] var?~
+Toggle the value of boolean variable var and display the new set value.
+~:se[t] var!~
+** accelerated-2d-canvas (bool)
+Enable or disable accelerated 2D canvas. When accelerated 2D canvas is enabled, WebKit may render some 2D canvas content using hardware accelerated drawing operations.
+#+begin_src conf
+  set accelerated-2d-canvas=true
+#+end_src
+** allow-file-access-from-file-urls (bool)
+Indicates whether file access is allowed from file URLs. By default, when something is loaded using a file URI, cross origin requests to other file resources are not allowed.
+#+begin_src conf
+set allow-file-access-from-file-urls=false
+#+end_src
+** allow-universal-access-from-file-urls (bool)
+Indicates whether or not JavaScript running in the context of a file scheme URL should be allowed to access content from any origin. By default, when something is loaded in a using a file scheme URL, access to the local file system and arbitrary local storage is not allowed.
+#+begin_src conf
+set allow-universal-access-from-file-urls=false
+#+end_src
+** caret (bool)
+Whether to enable accessibility enhanced keyboard navigation.
+#+begin_src conf
+set caret=false
+#+end_src
+** cookie-accept (string)
+Cookie accept policy {‘always’, ‘never’, ‘origin’ (accept all non-third-party cookies)}.
+#+begin_src conf
+set cookie-accept=origin
+#+end_src
+** closed-max-items (int)
+Maximum number of stored last closed URLs. If closed-max-items is set to 0, closed URLs will not be stored.
+#+begin_src conf
+set closed-max-items=5
+#+end_src
+** completion-css (string)
+CSS style applied to the inputbox completion list items.
+#+begin_src conf
+set completion-css=color:#d3d0c8;background-color:#393939;font:12pt DejaVu Sans Mono;
+#+end_src
+** completion-hover-css (string)
+CSS style applied to the inputbox completion list item that is currently hovered by the mouse.
+#+begin_src conf
+set completion-hover-css=color:#d3d0c8;background-color:#393939;font:12pt DejaVu Sans Mono;
+#+end_src
+** completion-selected-css (string)
+CSS style applied to the inputbox completion list item that is currently selected.
+#+begin_src conf
+set completion-selected-css=color:#d3d0c8;background-color:#515151;font:12pt DejaVu Sans Mono;
+#+end_src
+** cursiv-font (string)
+The font family used as the default for content using cursive font.
+#+begin_src conf :tangle no ## disabled
+set cursive-font=""
+#+end_src
+** dark-mode (bool)
+Whether to enable dark mode. Websites can use the `prefers-color-scheme’ media query to adjust styles according to this option.
+#+begin_src conf
+set dark-mode=true
+#+end_src
+** default-charset (string)
+The default text charset used when interpreting content with an unspecified charset.
+#+begin_src conf
+set default-charset=UTF8
+#+end_src
+** default-font (string)
+The font family to use as the default for content that does not specify a font.
+#+begin_src conf
+set default-font=DejaVu Sans
+#+end_src
+** default-zoom (int)
+Default Full-Content zoom level in percent. Default is 100.
+#+begin_src conf
+set default-zoom=120
+#+end_src
+** dns-prefetching (bool)
+Indicates if Vimb prefetches domain names.
+#+begin_src conf
+set dns-prefetching=false
+#+end_src
+** download-command (string)
+A command with placeholder %s that will be invoked to download a URI in case =download-use-external= is enabled.
+The following additional environment variable are available:
+
+=$VIMB_URI= The URI of the current opened page, normally the page where the download was started from, also known as referer.
+=$VIMB_DOWNLOAD_PATH= Setting value of download-path which would be used normally for downloads.
+Example:
+~:set download-command=/bin/sh -c "cd '$VIMB_DOWNLOAD_PATH' && curl -sLJOC - -e '$VIMB_URI' %s"~
+#+begin_src conf
+set download-command=/bin/sh -c 'curl --create-dirs --fail --globoff --location --no-clobber --output-dir "${VIMB_DOWNLOAD_PATH}" --proto =ftps,https --remote-name --remove-on-error --silent --speed-limit 5 --speed-time 10'
+#+end_src
+** download-path (string)
+Path to the default download directory. If no download directory is set, download will be written into current directory. The following pattern will be expanded if the download is started ~/, ~user, $VAR and ${VAR}.
+#+begin_src conf
+set download-path=~/Downloads/vimb
+#+end_src
+** download-use-external (bool)
+Indicates if the external download tool set as download-command should be used to handle downloads. If this is disabled Vimb will handle the download.
+#+begin_src conf
+set download-use-external=true
+#+end_src
+** editor-command (string)
+Command with placeholder =%s= called if form field is opened with =$EDITOR= to spawn the editor-like ~x-terminal-emulator -e vim %s~. To use gvim as the editor, it’s necessary to call it with =-f= to run it in the foreground.
+#+begin_src conf
+set editor-command="emacsclient -c %s"
+#+end_src
+** font-size (int)
+The default font size used to display text.
+#+begin_src conf
+set font-size=13
+#+end_src
+** frame-flattening (bool)
+Whether to enable the Frame Flattening. With this setting each subframe is expanded to its contents, which will flatten all the frames to become one scrollable page.
+#+begin_src conf
+set frame-flattening=true
+#+end_src
+** fullscreen (bool)
+Show the current window full-screen.
+#+begin_src conf
+set fullscreen=false
+#+end_src
+** hardware-acceleration-policy (string)
+This setting decides how to enable and disable hardware acceleration.
+‘ondemand’ enables the hardware acceleration when the web contents request it, disabling it again when no longer needed.
+‘always’ enforce hardware acceleration to be enabled.
+‘never’ disables it completely. Note that disabling hardware acceleration might cause some websites to not render correctly or consume more CPU.
+#+begin_src conf
+set hardware-acceleration-policy=always
+#+end_src
+** header (list)
+Comma separated list of headers that replaces default header sent by WebKit or new headers. The format for the header list elements is name[=[value]].
+Note that these headers will replace already existing headers. If there is no = after the header name, then the complete header will be removed from the request, if the = is present means that the header value is set to empty value.
+
+To use = within a header value the value must be quoted like shown in Example for the Cookie header.
+
+Example: ~:set header=DNT=1,User-Agent,Cookie='name=value'~ Send the ‘Do Not Track’ header with each request and remove the User-Agent Header completely from request.
+#+begin_src conf
+set header=DNT=1
+#+end_src
+
+** hint-follow-last (bool)
+If on, vimb automatically follows the last remaining hint on the page. If off hints are fired only if enter is pressed.
+#+begin_src conf
+set hint-follow-last=true
+#+end_src
+** hint-keys-same-length (bool)
+If on, all hint numbers will have the same length, so no hints will be ambiguous.
+#+begin_src conf
+set hint-keys-same-length=false
+#+end_src
+** hint-timeout (int)
+Timeout before automatically following a non-unique numerical hint. To disable auto fire of hints, set this value to 0.
+#+begin_src conf
+set hint-timeout=0
+#+end_src
+** hint-keys (string)
+The keys used to label and select hints. With its default value, each hint has a unique number which can be typed to select it, while all other characters are used to filter hints based on their text. With a value such as =asdfg;lkjh=, each hint is ‘numbered’ based on the characters of the home row. Note that the hint matching by label built of hint-keys is case sen‐ sitive. In this vimb differs from some other browsers that show hint labels in upper case, but match them lowercase. To have upper case hint labels, it’s possible to add following css to the ‘style.css’ file in vimb’s configuration directory.
+=._hintLabel {text-transform: uppercase !important;}=
+#+begin_src conf
+set hint-keys=1234567890
+#+end_src
+
+** hint-match-element (bool)
+If this is set to ‘true’ typed chars that are not part of the set ‘hint-keys’ are used to filter hinted DOM elements by their text value. If ‘hint-keys’ are set to chars instead of numbers it might be useful to disable matching of the elements by ‘hint-match-element=false’.
+#+begin_src conf
+set hint-match-element=true
+#+end_src
+** history-max-items (int)
+Maximum number of unique items stored in search-, command or URI history. If history-max-items is set to 0, the history file will not be changed. This setting has no effect if option --incognito is set.
+#+begin_src conf
+set history-max-items=1000000
+#+end_src
+** home-page (string)
+Homepage that vimb opens if started without a URI.
+#+begin_src conf
+set home-page=about:blank
+#+end_src
+** html5-database (bool)
+Whether to enable HTML5 client-side SQL database support. Client-side SQL database allows web pages to store structured data and be able to use SQL to manipulate that data asynchronous.
+#+begin_src conf
+set html5-database=true
+#+end_src
+** html5-local-storage (bool)
+Whether to enable HTML5 localStorage support. LocalStorage provides simple synchronous storage access.
+#+begin_src conf
+set html5-local-storage=true
+#+end_src
+** hyperlink-auditing (bool)
+Enable or disable support for <a ping>.
+#+begin_src conf
+set hyperlink-auditing=false
+#+end_src
+** images (bool)
+Determines whether images should be automatically loaded or not.
+#+begin_src conf
+set images=true
+#+end_src
+** incsearch (bool)
+While typing a search command, show where the pattern typed so far matches.
+#+begin_src conf
+set incsearch=true
+#+end_src
+** input-autohide (bool)
+If enabled the inputbox will be hidden whenever it contains no text.
+#+begin_src conf
+set input-autohide=true
+#+end_src
+** input-css (string)
+CSS style applied to the inputbox in normal state.
+#+begin_src conf
+set input-css=color:#d3d0c8;background-color:#393939;font:12pt DejaVu Sans Mono;
+#+end_src
+** input-error-css (string)
+CSS style applied to the inputbox in case of displayed error.
+#+begin_src conf
+set input-error-css=color:#f2777a;background-color:#393939;font:12pt DejaVu Sans Mono;
+#+end_src
+** javascript-can-access-clipboard (bool)
+Whether JavaScript can access the clipboard.
+#+begin_src conf
+set javascript-can-access-clipboard=true
+#+end_src
+** javascript-can-open-windows-automatically (bool)
+Whether JavaScript can open popup windows automatically without user interaction.
+#+begin_src conf
+set javascript-can-open-windows-automatically=false
+#+end_src
+** geolocation (bool)
+Controls website access to the geolocation API (‘always’, ‘never’, ‘ask’ - display a prompt each time)
+#+begin_src conf
+set geolocation=ask
+#+end_src
+** media-playback-allows-inline (bool)
+Whether media playback is full-screen only or inline playback is allowed. Setting it to false allows specifying that media playback should be always fullscreen.
+#+begin_src conf
+set media-playback-allows-inline=true
+#+end_src
+** media-playback-requires-user-gesture (bool)
+Whether a user gesture (such as clicking the play button) would be required to start media playback or load media. Setting it on requires a gesture by the user to start playback, or to load the media.
+#+begin_src conf
+set media-playback-requires-user-gesture=true
+#+end_src
+** media-stream (bool)
+Enable or disable support for MediaSource on pages. MediaSource is an experimental proposal which extends HTMLMediaElement to allow JavaScript to generate media streams for playback.
+#+begin_src conf
+set media-stream=false
+#+end_src
+** mediasource (bool)
+Enable or disable support for MediaSource on pages. MediaSource is an experimental proposal which extends HTMLMediaElement to allow JavaScript to generate media streams for playback.
+#+begin_src conf
+set mediasource=false
+#+end_src
+** minimum-font-size (int)
+The minimum font size used to display text.
+#+begin_src conf
+set minimum-font-size=8
+#+end_src
+** monospace-font (string)
+The font family used as the default for content using monospace font.
+#+begin_src conf
+set monospace-font=DevaVu Sans Mono
+#+end_src
+** monospace-font-size (int)
+Default font size for the monospace font.
+#+begin_src conf
+set monospace-font-size=13
+#+end_src
+** notification (string)
+Controls website access to the notification API, that sends notifications via dbus. (‘always’, ‘never’, ‘ask’ - display a prompt each time)
+#+begin_src conf
+set notification=ask
+#+end_src
+** offline-cache (bool)
+Whether to enable HTML5 offline web application cache support. Offline web application cache allows web applications to run even when the user is not connected to the network.
+#+begin_src conf
+set offline-cache=true
+#+end_src
+** print-backgrounds (bool)
+Whether background images should be drawn during printing.
+#+begin_src conf
+set print-backgrounds=false
+#+end_src
+** private-browsing (bool)
+Whether to enable private browsing mode. This suppresses printing of messages into JavaScript Console. At the time this is the only way to force WebKit to not allow a page to store data in the windows sessionStorage.
+#+begin_src conf :tangle no ## disabled
+set private-browsing=false
+#+end_src
+** plugins (bool)
+Determines whether or not plugins on the page are enabled.
+#+begin_src conf
+set plugins=false
+#+end_src
+** prevent-newwindow (bool)
+Whether to open links, that would normally open in a new window, in the current window. This option does not affect links fired by hinting.
+#+begin_src conf
+set prevent-newwindow=false
+#+end_src
+** sans-serif-font (string)
+The font family used as the default for content using sans-serif font.
+#+begin_src conf
+set sans-serif-font=DejaVu Sans
+#+end_src
+** scripts (bool)
+Determines whether or not JavaScript executes within a page.
+#+begin_src conf
+set scripts=true
+#+end_src
+** scroll-step (int)
+Number of pixel vimb scrolls if ‘j’ or ‘k’ is used.
+#+begin_src conf
+set scroll-step=10
+#+end_src
+** scroll-multiplier (int)
+Multiplier to increase the scroll distance if window is scrolled by mouse wheel.
+#+begin_src conf
+set scroll-multiplier=1
+#+end_src
+** serif-font (string)
+The font family used as the default for content using serif font.
+#+begin_src conf
+set serif-font=DejaVu Serif
+#+end_src
+** show-titlebar (bool)
+Determines whether the titlebar is shown (on systems that provide window decoration). Defaults to true.
+#+begin_src conf
+set show-titlebar=false
+#+end_src
+** site-specific-quirks (bool)
+Enables the site-specific compatibility workarounds.
+#+begin_src conf
+set site-specific-quirks=false
+#+end_src
+** smooth-scrolling (bool)
+Enable or disable support for smooth scrolling.
+#+begin_src conf
+set smooth-scrolling=true
+#+end_src
+** spacial-navigation (bool)
+Whether to enable the Spatial Navigation. This feature consists in the ability to navigate between focusable elements in a Web page, such as hyperlinks and form controls, by using Left, Right, Up and Down arrow keys. For example, if a user presses the Right key, heuristics determine whether there is an element they might be trying to reach towards the right, and if there are multiple elements, which element they probably want.
+#+begin_src conf :tangle no ## disabled
+set spacial-navigation=true
+#+end_src
+** spell-checking (bool)
+Enable or disable the spell checking feature.
+#+begin_src conf
+set spell-checking=true
+#+end_src
+** spell-checking-languages (string)
+Set comma separated list of spell checking languages to be used for spell checking. The locale string typically is in the form =lang_COUNTRY=, where =lang= is an ISO-639 language code, and =COUNTRY= is an ISO-3166 country code. For instance, =sv_FI= for Swedish as written in Finland or =pt_BR= for Portuguese as written in Brazil.
+#+begin_src conf
+set spell-checking-languages=en_GB
+#+end_src
+** status-bar (bool)
+Indicates if the status bar should be shown.
+#+begin_src conf
+set status-bar=true
+#+end_src
+** status-bar-show-settings (bool)
+Whether to show settings on the status bar. This shows on the right hand of the status bar whether some flags about current active setting..
+#+begin_src conf
+set status-bar-show-settings=true
+#+end_src
+** status-css (string)
+CSS style applied to the status bar on none https pages.
+#+begin_src conf
+set status-css=color:#ffcc66;background-color:#393939;font:12pt DejaVu Sans Mono;
+#+end_src
+** status-ssl-css (string)
+CSS style applied to the status bar on https pages with trusted certificate.
+#+begin_src conf
+set status-ssl-css=color:#99cc99;background-color:#393939;font:12pt DejaVu Sans Mono;
+#+end_src
+** status-ssl-invalid-css (string)
+CSS style applied to the status bar on https pages with untrusted certificate.
+#+begin_src conf
+set status-ssl-invalid-css=color:#f2777a;background-color:#393939;font:12pt DejaVu Sans
+#+end_src
+** strict-ssl (bool)
+If ‘on’, vimb will not load a untrusted https site.
+#+begin_src conf
+set strict-ssl=true
+#+end_src
+** stylesheet (bool)
+If ‘on’ the user defined styles-sheet is used.
+#+begin_src conf
+set stylesheet=true
+#+end_src
+** tabs-to-links (bool)
+Whether the Tab key cycles through elements on the page.
+If true, pressing the Tab key will focus the next element in the web view. Otherwise, the web view will interpret Tab key presses as normal key presses. If the selected element is editable, the Tab key will cause the insertion of a Tab character.
+#+begin_src conf
+set tabs-to-links=true
+#+end_src
+
+** timeoutlen (int)
+The time in milliseconds that is waited for a key code or mapped key sequence to complete.
+#+begin_src conf
+set timeoutlen=500
+#+end_src
+** user-agent (string)
+** The user-agent string used by WebKit.
+#+begin_src conf
+set user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36
+#+end_src
+** user-scripts (bool)
+Indicates if user style sheet file =$XDG_CONFIG_HOME/vimb/style.css= is sourced.
+#+begin_src conf
+set user-scripts=true
+#+end_src
+** webaudio (bool)
+Enable or disable support for WebAudio on pages. WebAudio is an experimental proposal for allowing web pages to generate Audio WAVE data from JavaScript.
+#+begin_src conf
+set webaudio=false
+#+end_src
+** webgl (bool)
+Enable or disable support for WebGL on pages.
+#+begin_src conf
+set webgl=false
+#+end_src
+** webinspector (bool)
+Determines whether or not developer tools, such as the Web Inspector, are enabled.
+#+begin_src conf
+set webinspector=true
+#+end_src
+** x-hint-command (string)
+Command used if hint mode =;x= is fired. The command can be any vimb command string. Note that the command is run through the mapping mechanism of vimb so it might change the behaviour by adding or changing mappings.
+~:set x-hint-command=:sh! curl -e <C-R>% <C-R>;~
+
+This fills the inputbox with the prefilled download command and replaces <C-R>%' with the current URI and ;' with the URI of the hinted element.
+#+begin_src conf
+set x-hint-command=:sh! mpv <C-R>% <C-R>;
+#+end_src
+** xss-auditor (bool)
+Whether to enable the XSS auditor. This feature filters some kinds of reflective XSS attacks on vulnerable web sites
+#+begin_src conf
+set xss-auditor=true
+#+end_src
+* Automatic commands
+
+An autocommand is a command that is executed automatically in response to some event, such as a URI being opened. Autocommands are very powerful. Use them with care and they will help you avoid typing many commands.
+
+Autocommands are built with following properties.
+
+group:: When the group argument is not given, Vimb uses the current group as defined with ‘:augroup’, otherwise, Vimb uses the group defined with group. Groups are useful to remove multiple grouped autocommands.
+event:: You can specify a comma separated list of event names. No white space can be used in this list.
+Events:
+- =LoadStarting= Fired before a new page is going to be opened. No data has been sent or received yet, the load may still fail for transport issues.
+- =LoadStarted= Fired if a new page is going to opened. No data has been received yet, the load may still fail for transport issues. Out of this reason this event has no associated URL to match.
+- =LoadCommitted= Fired if first data chunk has arrived, meaning that the necessary transport requirements are established, and the load is being performed. This is the right event to toggle content related setting like ‘scripts’, ‘plugins’ and such things.
+- =LoadFinished= Fires when everything that was required to display on the page has been loaded.
+- =DownloadStart= Fired right before a download is started. This is fired for vimb downloads as well as external downloads if ‘down‐load-use-external’ is enabled.
+- =DownloadFinished= Fired if a vimb managed download is finished. For external download this event is not available.
+- =DownloadFailed= Fired if a vimb managed download failed. For external download this event is not available.
+pat:: Comma separated list of patterns, matches in order to check if a autocommand applies to the URI associated to an event. To use =,= within the single patterns this must be escaped as =\,=.
+Patterns:
+- =\*= Matches any sequence of characters. This includes also / in contrast to shell patterns.
+- =?= Matches any single character except of /.
+- ={one,two}= Matches =one= or =two=. Any ={=, =,= and =}= within this pattern must be escaped by a =\=. =*= and =?= have no special meaning within the curly braces.
+- =\= Use backslash to escape the special meaning of =?*{},= in the pattern or pattern list.
+cmd:: Any ex command vimb understands. The leading =:= is not required. Multiple commands can be separated by =|=.
+~:au[tocmd] [group] {event} {pat} {cmd}~:: Add cmd to the list of commands that vimb will execute automatically on event for a URI matching pat autocmd-patterns. Vimb always adds the cmd after existing autocommands, so that the autocommands are executed in the order in which they were given.
+~:au[tocmd]! [group] {event} {pat} {cmd}~:: Remove all autocommands associated with event and which pattern match pat, and add the command cmd. Note that the pattern is not matches literally to find autocommands to remove, like vim does. Vimb matches the autocommand pattern with pat.
+~:au[tocmd]! [group] {event} {pat}~:: Remove all autocommands associated with event and which pattern matches pat.
+~:au[tocmd]! [group] * {pat}~:: Remove all autocommands with patterns matching pat for all events.
+~:au[tocmd]! [group] {event}~:: Remove all autocommands for event.
+~:au[tocmd]! [group]~:: Remove all autocommands.
+~:aug[roup] {name}~:: Define the autocmd group name for the following :autocmd commands. The name “end” selects the default group.
+~:aug[roup]! {name}~:: Delete the autocmd group name.
+
+Example:
+
+#+begin_example
+:aug mygroup
+:  au LoadCommitted * set scripts=off|set cookie-accept=never
+:  au LoadCommitted http{s,}://github.com/*.https://maps.google.de/* set scripts=on
+:  au LoadFinished https://maps.google.de/* set useragent=foo
+:aug end
+#+end_example
+** autoplay videos
+to autoplay videos, check the uri for =video= or =watch= strings and run ~mpv~. However, as that is a fairly imprecise method of determining if a video is at the other end of a url I use ~yt-dlp~ to simulate the request first, and only if it's happy moving onto using ~mpv~.
+#+begin_src conf
+  aug test
+    au LoadCommitted https://*{video,watch}* ::sh! bash -c 'yt-dlp --simulate --quiet "${VIMB_URI}" && mpv "${VIMB_URI}"'
+  aug end
+#+end_src
+* Shortcuts
+Shortcuts allows to open URL build up from a named template with additional parameters. If a shortcut named ‘dd’ is defined, you can use it with :open dd list of parameters to open the generated URL.
+
+Shortcuts are a good to use with search engines where the URL is nearly the same but a single parameter is user defined.
+
+Add a shortcut with the shortcut and URI template.
+The URI can contain multiple placeholders $0-$9 that will be filled by the parameters given when the shortcut is called. The parameters given when the shortcut is called will be split into as many parameters like the highest used placeholder.
+#+begin_example
+:shortcut-add shortcut=URI
+#+end_example
+
+To setup a search engine. Can be called by ~:open dl <my search phrase>~.
+#+begin_example
+:shortcut-add dl=https://duckduckgo.com/lite/?q=$0
+#+end_example
+To build url from given parameters. Can be called ~:open gh fanglingsu vimb~.
+#+begin_example
+:shortcut-add gh=https://github.com/$0/$1
+#+end_example
+To search for a route, all but the last parameter must be quoted if they contain spaces like ~:open map "city hall, London" railway station, London~
+#+begin_example
+:shortcut-add map=https://maps.google.com/maps?saddr=$0&daddr=$1
+#+end_example
+Remove the search engine to the given shortcut.
+#+begin_example
+:shortcut-remove shortcut
+#+end_example
+Set the shortcut for given shortcut as the default, that is the shortcut to be used if no shortcut is given and the string to open is not an URI. It doesn’t matter if the shortcut is already in use or not to be able to set it.
+#+begin_example
+:shortcut-default shortcut
+#+end_example
+** Github
+#+begin_src conf
+  shortcut-add gh=https://github.com/$0/$1
+#+end_src
+** GoLang pkg search
+#+begin_src conf
+  shortcut-add gos=https://pkg.go.dev/search?q=$0
+#+end_src
+** GoLang pkg standard lib direct
+#+begin_src conf
+  shortcut-add gob=https://pkg.go.dev/$0
+#+end_src
+* Themes
+** Main style
+#+begin_src css :tangle ~/.config/vimb/style.css
+  @media (prefers-color-scheme: dark) {
+  html,body,li,pre,div,textarea,body,input,td,tr,nav,article,header,p {
+      color: #ccc !important;
+      background-color: #111 !important;
+      background-image: none !important;
+  }
+  h1, h2, h3, h4, h5, h6 {
+      color: #aaa !important;
+  }
+  table, th, td {
+      border-color: grey !important;
+  }
+  pre {
+      background-color: #222 !important;
+  }
+  pre>code {
+      color: #ccc !important;
+  }
+  code {
+      background-color: #222 !important;
+  }
+  a {
+      color: #70e070 !important;
+  }
+  a:hover,a:focus {
+      color: #7070e0 !important;
+  }
+  a:visited {
+      color: #e07070 !important;
+  }
+  img {
+      opacity: .5;
+  }
+  img:hover {
+      opacity: 1;
+  }
+  div[vimbhint='container']{
+      background-color: #f2f0ec !important;
+      border: 1px solid #2d2d2d !important;
+      color: #2d2d2d !important;
+      font: bold 10pt monospace !important;
+      opacity: 1 !important;
+      text-transform: uppercase !important;
+  }
+  span[vimbhint^='label'] {
+      font: bold 11pt monospace !important;
+      background-color: #000 !important;
+      color: #ff0 !important;
+      padding: .07em .22em !important;
+      -webkit-transform:translate(-.5em,-.5em) !important;
+  }
+  ,*[vimbhint^='hint'] {
+      background-color: #bb9 !important;
+      color: #2d2d2d !important;
+  }
+  ,*[vimbhint^='hint focus'] {
+      background-color: #66cc99 !important;
+      color: #000 !important;
+  }
+  }
+#+end_src
