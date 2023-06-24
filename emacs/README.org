@@ -147,6 +147,29 @@ On fist use on after the package is installed you need to run
                     (set-face-attribute 'default nil :font "Menlo" :height 110))
 #+end_src
 
+*** Snippets
+Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see what it's like
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :config
+    (setq yas-snippet-dirs '(
+                             "~/.emacs.d/snippets"  ;; personal snippets
+                             ))
+    (yas-global-mode))
+  (use-package yasnippet-snippets
+    :ensure t)
+
+#+end_src
+
+*** Aggressive indenting
+[[https://github.com/malabarba/aggressive-indent-mode][agressive-indent-mode]] looks like something I would like, so I'm giving it a go
+#+begin_src emacs-lisp
+  (use-package aggressive-indent
+    :ensure t
+    :config
+    (global-aggressive-indent-mode 1))
+#+end_src
 
 *** Setup Theme Stuff
 **** Modus theme
@@ -469,7 +492,6 @@ Org is installed by default, but this makes sure we're on the latest version. Al
     (make-directory (file-name-directory ele))))
 
 #+end_src
-
 **** Nice Bullets
 [[https://github.com/integral-dw/org-superstar-mode][Org-superstar]] will make bullets and lists much nicer to look at
 
@@ -682,6 +704,10 @@ Magit https://magit.vc is a nice git porcelain inside emacs
 *** Install Packages
 #+begin_src emacs-lisp
   (use-package magit)
+#+end_src
+*** GPG signing commits requires emacs act as pinentry
+#+begin_src emacs-lisp
+(setq epg-pinentry-mode 'loopback)
 #+end_src
 ** Pass
 [[https://www.passwordstore.org/][The Unix Password Store]] integrates with emacs out of the box!

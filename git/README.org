@@ -2,6 +2,13 @@
 #+PROPERTY: header-args :results silent :mkdirp yes :comments both
 
 
+* Prerequisits:
+I make use of both GPG signed commits and [[https://pre-commit.com][pre-commit]] tools. My GPG Key is stored securely and will need to be imported onto the machine.
+To install pre-commit o Gentoo:
+#+begin_src bash :tangle no
+  emerge dev-vcs/pre-commit
+#+end_src
+
 * Global Ignores
 [[https://github.com/github/gitignore][GitHub Gitignore]] repo has many great gitignore files for all sorts of stuff, so I'm +stealing+ making use of the good effort they have already put in.
 This snippet uses [[https://www.gnu.org/software/emacs/manual/html_node/org/Noweb-Reference-Syntax.html][NoWeb]] to write a babel function that gets the specified gitignore from [[https://github.com/github/gitignore]]

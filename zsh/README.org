@@ -8,6 +8,9 @@ Zsh is my prefered terminal. Docs: [[https://zsh.sourceforge.io/Doc/Release/zsh_
 Zsh reads different [[https://zsh.sourceforge.io/Doc/Release/Files.html#Files-1][startup files]] depending on how it's invoked.
 =ZDOTDIR= is the directory to search for shell startup files (.zshrc, etc), if not $HOME.
 * .zshenv
+:PROPERTIES:
+:header-args: :tangle ~/.config/zsh/.zshenv
+:END:
 
 =/etc/zshenv= is always the first file to be sourced, this cannot be changed and so should be minimal. After the global =/etc/zshenv= is read next is =${ZDOTDIR}/.zshenv=
 
@@ -21,7 +24,7 @@ We want to keep all config as much as possible in =XDG= places so keep a minimal
 *** PATH
 [[https://zsh.sourceforge.io/Doc/Release/Parameters.html#index-PATH][PATH]] is a colon seperated list of directories to search when running commands
 Deriving =PATH= from =path_dirs= may seem awkward, but it lets me lay out hte path directories in a visually better manner.
-#+begin_src bash :tangle ~/.config/zsh/.zshenv
+#+begin_src bash
   path_dirs=(
       ${HOME}/.local/bin
       ${HOME}/go/bin
@@ -43,35 +46,40 @@ Deriving =PATH= from =path_dirs= may seem awkward, but it lets me lay out hte pa
 #+end_src
 *** Editor
 Lets setup emacsclient as our editor of choice
-#+begin_src bash :tangle ~/.config/zsh/.zshenv
+#+begin_src bash
 export EDITOR=$(whence emacsclient)
 #+end_src
 ***  PS4
 The [[https://zsh.sourceforge.io/Doc/Release/Parameters.html#index-PS4][PS4]] prompt is the execution trace promp. Useful when debugging shell scripts
-#+begin_src bash :tangle ~/.config/zsh/.zshenv
+#+begin_src bash
 export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 #+end_src
 *** Key timeout
 The [[https://zsh.sourceforge.io/Doc/Release/Parameters.html#index-KEYTIMEOUT][KEYTIMEOUT]] is the delay in milliseconds Zsh will wait for multi-char sequences
-#+begin_src bash :tangle ~/.config/zsh/.zshenv
+#+begin_src bash
 export KEYTIMEOUT=500
 #+end_src
 *** Zsh Custom Directories
 Zsh custom directory is used for installing and loading custom stuff.
-#+begin_src bash :tangle ~/.config/zsh/.zshenv
+#+begin_src bash
 export ZSH_CUSTOM=~/.config/zsh
 #+end_src
 *** CDPATH
 [[https://zsh.sourceforge.io/Doc/Release/Parameters.html#index-CDPATH][CDPATH]] variable works like the [[PATH][PATH]] variable, but for switching directories:
 I want easy access to all my =area_51= subdirs as that's where I do most of my work
-#+begin_src bash :tangle ~/.config/zsh/.zshenv
+#+begin_src bash
   cdpath=( $cdpath ~/area_51/* ~/area_51/*/* )
 export cdpath
 #+end_src
 *** History
-#+begin_src bash :tangle ~/.config/zsh/.zshenv
+#+begin_src bash
   HISTSIZE=100000
   SAVEHIST=100000
+#+end_src
+*** GPG
+gpg needs some env vars setting
+#+begin_src bash
+export GPG_TTY=$(tty)
 #+end_src
 * .zprofile
 :PROPERTIES:
@@ -402,4 +410,111 @@ Just a silly wrapper around =dig=
 printf "Can you DIG it?\n"
 
 command dig $@ && printf "\nYes you can!\n" || printf "No sorry you arn't cool enough to dig it.\n"
+#+end_src
+
+* Additional Scripts
+
+** Gclone
+:PROPERTIES:
+:header-args: :shebang #!/usr/bin/env bash :tangle ~/.local/bin/gclone :mkdirp yes
+:END:
+Gclone is a bash script to wrap `git clone` it ensures all my git repositories are cloned consistently.
+
+*** VARS
+Start by defining some regexes
+#+begin_src bash
+  HOST_REGEX="([^:/]+)(:[0-9]+)?"
+  SSH_USER_REGEX="(([^@]+)@)?"
+
+  STD_REPO_REGEX="^((http|ftp)s?|git)://${HOST_REGEX}/(.*)"
+  SSH_WITH_PROTO_REGEX="^(ssh://)?${SSH_USER_REGEX}${HOST_REGEX}/(.*)"
+  SSH_NO_PROTO_REGEX="${SSH_USER_REGEX}${HOST_REGEX}:(.*)"
+  LOCAL_REPO_REGEX="file://(/.*)"
+
+#+end_src
+
+*** =get_clone_dir= function
+Determines the right path to clone repository to based on repo type, then echo's it to stdout
+#+begin_src bash
+  get_clone_dir() {
+      repo_url=$1
+
+      if [[ ${repo_url} =~ ${STD_REPO_REGEX} ]]; then
+          PROTOCOL=${BASH_REMATCH[1]}
+          HOSTNAME=${BASH_REMATCH[3]}
+          PATH=${BASH_REMATCH[5]}
+      elif [[ ${repo_url} =~ ${SSH_WITH_PROTO_REGEX} ]]; then
+          PROTOCOL=${BASH_REMATCH[1]}
+          USER=${BASH_REMATCH[2]}
+          HOSTNAME=${BASH_REMATCH[4]}
+          PATH=${BASH_REMATCH[6]}
+      elif [[ ${repo_url} =~ ${SSH_NO_PROTO_REPO_REGEX} ]]; then
+          PROTOCOL=ssh
+          USER=${BASH_REMATCH[1]}
+          HOSTNAME=${BASH_REMATCH[3]}
+          PATH=${BASH_REMATCH[5]}
+      elif [[ -d ${repo_url} || ${repo_url} =~ ${LOCAL_REPO_REGEX} ]]; then
+          PROTOCOL=file
+
+          if  [[ -d ${repo_url} ]]; then
+              PATH=${repo_url}
+          else
+              PATH=${BASH_REMATCH[1]}
+          fi
+      else
+          {
+              echo "ERROR Unable to parse git repo URL ${repo_url}"
+              echo "cloning to git default location instead"
+          } >&2
+      fi
+
+      clone_dir=${GCLONE_REPO_DIR:=${HOME}/area_51/}
+      repo_dir=${clone_dir}/${HOSTNAME}/${PATH}
+      [[ -d ${repo_dir} ]] || mkdir -p ${repo_dir}
+      echo ${repo_dir}
+  }
+
+#+end_src
+
+*** parse arguments
+Start by setting =option_expected= to false, then set it to true if we encounter a param that expects an option and process.
+#+begin_src bash
+  opts=()
+  params=()
+  option_expected=false
+  for arg in "${@}"; do
+      if [[ "${arg}" =~ ^- && ${option_expected} == "true" ]]; then
+          option_expected=false
+          opts+=(${arg})
+      elif [[ "${arg}" =~ ^- && ${option_expected} == "false" ]]; then
+          option_expected=true
+          opts+=(${arg})
+      elif [[ "${arg}" =~ ^[^-] && ${option_expected} == "true" ]]; then
+          option_expected=false
+          opts+=(${arg})
+      elif [[ "${arg}" =~ ^[^-] && ${option_expected} == "false" ]]; then
+          params+=(${arg})
+      fi
+  done
+#+end_src
+
+*** ensure output dir is set
+#+begin_src bash
+  if [[ ${#params[@]} -le 1 ]]; then
+    params+=($(get_clone_dir ${params[0]}))
+  fi
+#+end_src
+
+*** clone repo
+We clone repos bare as they are awesome, you can have multiple branches checked out at the same time.
+#+begin_src bash
+  git clone --bare ${opts[@]} ${params[@]}
+  cd $(get_clone_dir ${params[0]})
+  git fetch
+#+end_src
+
+*** create checkouts directory and checkout master/main
+#+begin_src bash
+  mkdir checkouts
+  git for-each-ref refs/heads --format='%(refname:short)' --shell | xargs -I '%' git worktree add --checkout ./checkouts/% %
 #+end_src
