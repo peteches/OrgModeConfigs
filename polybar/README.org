@@ -1,0 +1,62 @@
+#+title: Peteches Polybar Stuff
+#+PROPERTY: header-args  :comments both :results silent :mkdirp yes
+
+[[https://polybar.github.io][Polybar]] is a fast and easy to use tool for creating status bars.
+
+** Prerequisites:
+- polybar
+- notify-send
+- xrandr
+
+*** Install from Gentoo
+#+begin_src bash :tangle no
+  # enable required use flags
+  euse -E -p x11-misc/polybar alsa curl i3wm ipc mpd network pulseaudio
+  # unmask notify-send utility
+  echo -e 'x11-misc/tinynotify-send ~amd64\nx11-libs/libtinynotify ~amd64\nx11-libs/libtinynotify-cli ~amd64' | sudo tee /etc/portage/package.accept_keywords/tinynotify-send
+  emerge x11-misc/polybar x11-misc/tinynotify-send x11-apps/xrandr net-wireless/iw
+#+end_src
+** Polybar needs a startup script to keep everything clean
+#+begin_src bash :tangle ~/.local/bin/polybar.sh :mkdirp yes :shebang #!/bin/bash
+
+  #wait for the process to shutdown.
+  polyBarPID=$(pgrep -x polybar)
+  if [[ -n ${polyBarPID} ]]; then
+      kill ${polyBarPID}
+  fi
+
+  if ! [[ -x $(which xrandr) ]]; then
+      echo "$0 depends on xrandr please install and make sure it is available in PATH" >&2
+  fi
+  if ! [[ -x $(which polybar) ]]; then
+      echo "$0 depends on polybar please install and make sure it is available in PATH" >&2
+  fi
+  if ! [[ -x $(which notify-send) ]]; then
+      echo "$0 depends on notify-send please install and make sure it is available in PATH" >&2
+  fi
+  if ! [[ -x $(which iw) ]]; then
+      echo "$0 depends on iw please install and make sure it is available in PATH" >&2
+  fi
+
+  {
+    echo "include-file = ${HOME}/.config/polybar/config"
+    for mon in $(xrandr --listactivemonitors | awk '/^ [0-9]+:/{print $NF}'); do
+         echo "[bar/${mon}]"
+         echo "  inherit = bar/base"
+         echo "  monitor = ${mon}"
+         echo ""
+    done
+
+    wlanIface=$(iw dev | awk '$1 =="Interface"{print $2;quit}')
+    echo "[module/local_wlan]"
+    echo "  interface = ${wlanIface}"
+    echo ""
+
+  } > ${HOME}/.config/polybar/main
+
+  for mon in $(xrandr --listactivemonitors | awk '/^ [0-9]+:/{print $NF}'); do
+        polybar --quiet --config=${HOME}/.config/polybar/main $mon &
+  done
+
+  notify-send "Polybar launched..."
+#+end_src
