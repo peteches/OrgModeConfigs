@@ -100,6 +100,11 @@ Indicates if Vimb prefetches domain names.
 #+begin_src conf
 set dns-prefetching=false
 #+end_src
+** download-path (string)
+Path to the default download directory. If no download directory is set, download will be written into current directory. The following pattern will be expanded if the download is started ~/, ~user, $VAR and ${VAR}.
+#+begin_src conf
+set download-path=/home/peteches/Downloads/vimb
+#+end_src
 ** download-command (string)
 A command with placeholder %s that will be invoked to download a URI in case =download-use-external= is enabled.
 The following additional environment variable are available:
@@ -109,12 +114,7 @@ The following additional environment variable are available:
 Example:
 ~:set download-command=/bin/sh -c "cd '$VIMB_DOWNLOAD_PATH' && curl -sLJOC - -e '$VIMB_URI' %s"~
 #+begin_src conf
-set download-command=/bin/sh -c 'curl --create-dirs --fail --globoff --location --no-clobber --output-dir "${VIMB_DOWNLOAD_PATH}" --proto =ftps,https --remote-name --remove-on-error --silent --speed-limit 5 --speed-time 10'
-#+end_src
-** download-path (string)
-Path to the default download directory. If no download directory is set, download will be written into current directory. The following pattern will be expanded if the download is started ~/, ~user, $VAR and ${VAR}.
-#+begin_src conf
-set download-path=~/Downloads/vimb
+set download-command=/bin/sh -c 'curl --create-dirs --fail --globoff --location --no-clobber --output-dir '${VIMB_DOWNLOAD_PATH}' --proto "=ftps,https" --remote-name --remove-on-error --silent --speed-limit 5 --speed-time 10 %s'
 #+end_src
 ** download-use-external (bool)
 Indicates if the external download tool set as download-command should be used to handle downloads. If this is disabled Vimb will handle the download.
@@ -550,7 +550,7 @@ Set the shortcut for given shortcut as the default, that is the shortcut to be u
 #+end_src
 * Themes
 ** Main style
-#+begin_src css :tangle ~/.config/vimb/style.css
+#+begin_src css :tangle no # ~/.config/vimb/style.css
   @media (prefers-color-scheme: dark) {
   html,body,li,pre,div,textarea,body,input,td,tr,nav,article,header,p {
       color: #ccc !important;
