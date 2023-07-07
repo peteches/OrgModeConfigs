@@ -429,8 +429,8 @@ Start by defining some regexes
   SSH_USER_REGEX="(([^@]+)@)?"
 
   STD_REPO_REGEX="^((http|ftp)s?|git)://${HOST_REGEX}/(.*)"
-  SSH_WITH_PROTO_REGEX="^(ssh://)?${SSH_USER_REGEX}${HOST_REGEX}/(.*)"
-  SSH_NO_PROTO_REGEX="${SSH_USER_REGEX}${HOST_REGEX}:(.*)"
+  SSH_WITH_PROTO_REPO_REGEX="^(ssh://)?${SSH_USER_REGEX}${HOST_REGEX}/(.*)"
+  SSH_NO_PROTO_REPO_REGEX="${SSH_USER_REGEX}${HOST_REGEX}:(.*)"
   LOCAL_REPO_REGEX="file://(/.*)"
 
 #+end_src
@@ -445,7 +445,7 @@ Determines the right path to clone repository to based on repo type, then echo's
           PROTOCOL=${BASH_REMATCH[1]}
           HOSTNAME=${BASH_REMATCH[3]}
           PATH=${BASH_REMATCH[5]}
-      elif [[ ${repo_url} =~ ${SSH_WITH_PROTO_REGEX} ]]; then
+      elif [[ ${repo_url} =~ ${SSH_WITH_PROTO_REPO_REGEX} ]]; then
           PROTOCOL=${BASH_REMATCH[1]}
           USER=${BASH_REMATCH[2]}
           HOSTNAME=${BASH_REMATCH[4]}
