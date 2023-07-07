@@ -142,9 +142,10 @@ On fist use on after the package is installed you need to run
 *** Configure Fonts
 #+begin_src emacs-lisp
   (peteches/sys-exe gnu/linux
-                     (set-face-attribute 'default nil :font "DejaVu Sans Mono" :height 110))
+    (add-to-list 'default-frame-alist '(font . "FiraCode Nerd Font Mono"))
+    (set-face-attribute 'default nil :font "FiraCode Nerd Font Mono" :height 110))
   (peteches/sys-exe darwin
-                    (set-face-attribute 'default nil :font "Menlo" :height 110))
+    (set-face-attribute 'default nil :font "Menlo" :height 110))
 #+end_src
 
 *** Snippets
@@ -514,9 +515,9 @@ The [[https://gitlab.com/jabranham/mixed-pitch][mixed pitch package]], by Alex B
                               (set-face-attribute 'fixed-pitch nil :font "PT Mono")
                               (set-face-attribute variable-pitch nil :font "Georgia")))
   (peteches/sys-exe "gnu/linux" (
-                                 (set-face-attribute default nil :font "DejaVu Sans Mono" :height 230)
-                                 (set-face-attribute 'fixed-pitch nil :font "DejaVu Sans Mono")
-                                 (set-face-attribute 'variable-pitch nil :font "Cantarell"))))
+                                 (set-face-attribute default nil :font "FiraCode Nerd Font Mono" :height 230)
+                                 (set-face-attribute 'fixed-pitch nil :font "FiraCode Nerd Font Mono")
+                                 (set-face-attribute 'variable-pitch nil :font "FiraCode Nerd Font"))))
   (add-hook 'mixed-pitch-mode #'solaire-mode-reset)
 #+end_src
 **** Use a postframe for company mode
