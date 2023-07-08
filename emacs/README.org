@@ -429,15 +429,14 @@ This sets up a trace of where the point is withing the project.
     (use-package lsp-mode
       :commands lsp lsp-deferred
       :init
-	(setq lsp-keymap-prefix "C-c l")
+        (setq lsp-keymap-prefix "C-c l")
       :config
-	(lsp-enable-which-key-integration t)
-	(setq lsp-go-build-flags (vector "--tags=integration"))
+        (lsp-enable-which-key-integration t)
       :hook
-	(
-	  (go-mode . lsp)
-	  (lsp-mode . peteches/lsp-mode-settings)
-	)
+        (
+          (go-mode . lsp)
+          (lsp-mode . peteches/lsp-mode-settings)
+        )
     )
   (use-package lsp-ui
     :hook (lsp-mode . lsp-ui-mode)
@@ -477,7 +476,14 @@ I like Golang so lets set it up
 **** Install go-mode
 #+begin_src emacs-lisp
   (use-package go-mode
+    :ensure t
+    :after lsp-mode
     :config
+    (setq lsp-go-build-flags (vector "--tags=integration")
+          lsp-go-analyses '(nilness . t)
+          lsp-go-use-gofumpt t
+
+          )
     (require 'dap-dlv-go))
 #+end_src
 
