@@ -151,16 +151,20 @@ On fist use on after the package is installed you need to run
 *** Snippets
 Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see what it's like
 #+begin_src emacs-lisp
+  (use-package yasnippet-snippets
+    :ensure t)
+
   (use-package yasnippet
     :ensure t
+    :custom
+    (yas-verbosity 2)
+    (yas-wrap-around-region t)
     :config
     (setq yas-snippet-dirs '(
                              "~/.emacs.d/snippets"  ;; personal snippets
                              ))
+    (yas-reload-all)
     (yas-global-mode))
-  (use-package yasnippet-snippets
-    :ensure t)
-
 #+end_src
 
 *** Aggressive indenting
