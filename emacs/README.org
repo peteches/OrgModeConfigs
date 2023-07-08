@@ -255,11 +255,18 @@ Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see
 *** Setup Company completion
 **** Set up some global modes / settings
 #+begin_src emacs-lisp
-  (use-package company
-    :hook
-    (add-hook 'after-init-hook 'global-company-mode)
-    :config
-    (company-mode))
+(use-package company
+  :hook
+  (add-hook 'after-init-hook 'global-company-mode)
+  :config
+  (setq company-minimum-prefix-length 3
+	company-tooltip-align-annotations t
+	company-tooltip-offset-display 'lines
+	)
+  (with-eval-after-load 'company
+    (define-key company-active-map (kbd "RET") nil)
+    (define-key company-active-map (kbd "M-RET") #'company-complete-selection))
+  (company-mode))
 #+end_src
 
 *** Lets use a Helpful package
