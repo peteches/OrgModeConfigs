@@ -80,14 +80,18 @@ Throughout this config I'll need to make descisions based on if it's being used 
 ***** Install all icons doom uses
 On fist use on after the package is installed you need to run
 
-=M-x all-the-icons-install-fonts=
+=M-x nerd-icons-install-fonts=
 
 #+begin_src emacs-lisp
-  (use-package all-the-icons)
+  (use-package nerd-icons
+    :ensure t
+    :custom
+    (nerd-icons-font-family "Symbols Nerd Font Mono"))
 #+end_src
 
 #+begin_src emacs-lisp
   (use-package doom-modeline
+    :ensure t
     :init (doom-modeline-mode 1))
 #+end_src
 
@@ -140,9 +144,9 @@ On fist use on after the package is installed you need to run
 #+end_src
 
 *** Configure Fonts
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no # disable while testing nerd-icons font
   (peteches/sys-exe gnu/linux
-    (add-to-list 'default-frame-alist '(font . "FiraCode Nerd Font Mono"))
+    (add-to-list 'default-frame-alist '(font . h"))
     (set-face-attribute 'default nil :font "FiraCode Nerd Font Mono" :height 110))
   (peteches/sys-exe darwin
     (set-face-attribute 'default nil :font "Menlo" :height 110))
@@ -151,20 +155,33 @@ On fist use on after the package is installed you need to run
 *** Snippets
 Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see what it's like
 #+begin_src emacs-lisp
-  (use-package yasnippet-snippets
-    :ensure t)
-
   (use-package yasnippet
     :ensure t
+    :bind (:map yas-minor-mode-map
+                 ("C-RET" . yas-expand)
+                 )
     :custom
     (yas-verbosity 2)
     (yas-wrap-around-region t)
     :config
-    (setq yas-snippet-dirs '(
-                             "~/.emacs.d/snippets"  ;; personal snippets
-                             ))
+    (defun company-yasnippet-or-completion ()
+      (interactive)
+      (let ((yas-fallback-behavior nil))
+        (unless (yas-expand)
+          (call-interactively #'company-complete-common))))
+    (setq yas-snippet-dirs (append yas-snippet-dirs
+                                   '(
+                                     "~/.config/emacs/snippets"  ;; personal snippets
+                                     ))
+          yas-triggers-in-field t
+     )
     (yas-reload-all)
-    (yas-global-mode))
+    (yas-global-mode)
+    :hook (company-mode . (lambda ()
+                        (substitute-key-definition 'company-complete-common
+                                                   'company-yasnippet-or-completion
+                                                   company-active-map)))
+  )
 #+end_src
 
 *** Aggressive indenting
@@ -255,18 +272,29 @@ Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see
 *** Setup Company completion
 **** Set up some global modes / settings
 #+begin_src emacs-lisp
-(use-package company
-  :hook
-  (add-hook 'after-init-hook 'global-company-mode)
-  :config
-  (setq company-minimum-prefix-length 3
-	company-tooltip-align-annotations t
-	company-tooltip-offset-display 'lines
-	)
-  (with-eval-after-load 'company
-    (define-key company-active-map (kbd "RET") nil)
-    (define-key company-active-map (kbd "M-RET") #'company-complete-selection))
-  (company-mode))
+  (use-package company
+    :hook
+    (add-hook 'after-init-hook 'global-company-mode)
+    :config
+    (setq company-minimum-prefix-length 3
+          company-tooltip-align-annotations t
+          company-tooltip-offset-display 'lines
+
+          company-dabbrev-minimum-length 5
+          company-dabbrev-other-buffers t
+
+          company-files-exclusions '(".git/" ".DS_Store")
+
+          company-backends `((company-yasnippet  :with
+                                           company-capf
+                                           company-dabbrev
+                                           company-files
+                                           ))
+          )
+    (with-eval-after-load 'company
+      (define-key company-active-map (kbd "RET") nil)
+      (define-key company-active-map (kbd "M-RET") #'company-complete-selection))
+    (company-mode))
 #+end_src
 
 *** Lets use a Helpful package
@@ -435,6 +463,7 @@ This sets up a trace of where the point is withing the project.
       :hook
         (
           (go-mode . lsp)
+          (go-ts-mode . lsp) ;; for treesitter go mode
           (lsp-mode . peteches/lsp-mode-settings)
         )
     )
@@ -459,11 +488,28 @@ Try these commands with =M-x=:
 #+begin_src emacs-lisp
   (use-package dap-mode
     :config
+    (setq dap-print-io t)
     (general-define-key
      :keymaps 'lsp-mode-map
      :prefix lsp-keymap-prefix
      "d" '(dap-hydra t :wk "debugger")))
+
+  (use-package dap-ui
+    :ensure t
+    :config
+    (dap-mode 1)
+    (dap-ui-mode 1)
+    )
+
 #+end_src
+
+**** String Inflection
+The [[https://github.com/akicho8/string-inflection][String Inflection]] package is useful for cycling through =CamelCase=, =snake_case=, and others.
+#+begin_src emacs-lisp
+  (use-package string-inflection
+    :ensure t
+)
+#+End_src
 
 *** Docker
 I use docker a lot so lets have a docker mode
@@ -480,12 +526,225 @@ I like Golang so lets set it up
     :after lsp-mode
     :config
     (setq lsp-go-build-flags (vector "--tags=integration")
-          lsp-go-analyses '(nilness . t)
+          lsp-go-analyses '(
+                            (nilness . t)
+                            )
           lsp-go-use-gofumpt t
 
           )
     (require 'dap-dlv-go))
 #+end_src
+**** Treesitter grammer
+#+begin_src emacs-lisp
+  (push '(go "https://github.com/tree-sitter/tree-sitter-go")
+        treesit-language-source-alist)
+  (push '(gomod "https://github.com/camdencheek/tree-sitter-go-mod")
+        treesit-language-source-alist)
+  (push '(go-mode . go-ts-mode)
+        major-mode-remap-alist)
+#+end_src
+*** Elisp
+**** Treesitter grammer
+#+begin_src emacs-lisp
+  (push '(elisp "https://github.com/Wilfred/tree-sitter-elisp")
+        treesit-language-source-alist)
+  (push '(elisp-mode . elisp-ts-mode)
+        major-mode-remap-alist)
+#+end_src
+*** TreeSitter
+**** Add Treesitter configs
+#+begin_src emacs-lisp
+  (use-package treesit
+    :ensure nil
+    :config
+    (setq treesit-font-lock-level 10)
+    (dolist (grammar
+             treesit-language-source-alist)
+      (unless (treesit-language-available-p (car grammar))
+        (treesit-install-language-grammar (car grammar)))))
+#+end_src
+
+**** Treesitter configs
+
+***** Golang
+:PROPERTIES:
+:header-args:emacs-lisp: :tangle ~/.config/emacs/snippets/go-ts-mode/.yas-setup.el
+:END:
+
+****** Functions
+******* get fieldname
+I want to retrieve the name of a struct field from the line the cursor is currently on
+#+begin_src emacs-lisp
+  (defun go-ts-get-struct-fieldname (&optional p)
+    "Uses Treesitter to get fieldname of struct field. if P not set use point."
+    (or p (setq p (point)))
+    (treesit-node-text
+     (treesit-node-child-by-field-name
+      (treesit-node-parent (treesit-node-at p))
+      "name")))
+#+end_src
+******* get function return values
+#+begin_src emacs-lisp
+  (defun go-ts-get-func-node (&optional p)
+    "Uses Treesitter to get return Types of a function. If P not set use point."
+    (or p (setq p (point)))
+    (treesit-parent-until (treesit-node-at p)
+                          (lambda(n)
+                            (or (string-match-p "function_declaration" (treesit-node-type n))
+                                (string-match-p "method_declaration" (treesit-node-type n))))))
+#+end_src
+*******  Initialise a go type into concrete Zero value
+#+begin_src emacs-lisp
+  ;; liberated from https://blog.meain.io/2021/intelligent-snippets-treesitter/
+  (defun go-ts-initialise-zero-value (type)
+    "Return an initialised zero value of type TYPE."
+    (if (treesit-node-p type)
+        (setq type (treesit-node-text type)))
+    (message "testing: %s" type)
+    (pcase type
+      ("error" (go-ts-initialise-error))
+      ("string" "\"\"")
+      ("rune" "0")
+      ("bool" "false")
+      ("chan" "nil")
+      ((pred (string-match-p "^int\\(8\\|16\\|32\\|64\\)?$")) "0") ; any integer type
+      ((pred (string-match-p "^float\\(32\\|64\\)$")) "0.0") ; any float type
+      ((pred (string-prefix-p "<-")) "nil") ; channels
+      ((pred (string-prefix-p "[")) "nil") ; arrays
+      ((pred (string-prefix-p "*")) "nil") ; pointers to things
+      ((pred (string-match " ")) nil) ; for situations with return name
+      (_ (concat type "{}"))))
+#+end_src
+******* Initialise an err
+#+begin_src emacs-lisp
+  (defun go-ts-initialise-error (&optional p)
+    "Uses Treesitter to dermine best value of error in position P. If P not set use point."
+    (or p (setq p (point)))
+    (let ((parent-node (treesit-parent-until (treesit-node-at p)
+                                             (lambda(n)
+                                               (string-match-p "if_statement" (treesit-node-type n))))))
+      (message "initialising error: %s" (treesit-node-text parent-node))
+      (if parent-node
+          (format "fmt.Errorf(\"${1:error detected}: %%w\", %s)" (treesit-node-text (treesit-node-child-by-field-name (treesit-node-child-by-field-name parent-node "condition") "left")))
+        "nil")))
+#+end_src
+
+******* Get function return types
+#+begin_src emacs-lisp
+  (defun go-ts-get-initialised-return-types (&optional p)
+    "Uses Treesitter to turn a functions return values into a snippet with default values. If P not set use point."
+    (or p (setq p (point)))
+    (string-join (remove nil (mapcar 'go-ts-initialise-zero-value (treesit-query-capture (go-ts-get-func-node p) go-ts-query-get-func-return-types nil nil t))) ", "))
+#+end_src
+
+****** Compiled queries
+******* Get function / method return types
+
+
+#+begin_src emacs-lisp
+  (setq go-ts-query-get-func-return-types-str "
+    [
+            (function_declaration)
+            (method_declaration)
+    ] result: (_) @type
+    [
+            (function_declaration)
+            (method_declaration)
+    ] result: (
+            parameter_list (
+            parameter_declaration type: (_) @type_list
+        )
+    )
+    ")
+  (if (treesit-query-validate 'go go-ts-query-get-func-return-types-str)
+      (setq go-ts-query-get-func-return-types (treesit-query-compile 'go go-ts-query-get-func-return-types-str)))
+#+end_src
+
+****** Snippet Definitions
+******* set parent mode of go-ts-mode
+#+begin_src conf :tangle ~/.config/emacs/snippets/go-ts-mode/.yas-parents
+  go-mode
+#+end_src
+
+******* Struct Tag
+#+begin_src conf :tangle ~/.config/emacs/snippets/go-ts-mode/fieldTag
+    # -*- mode: snippet -*-
+    # name: Struct Field Tag
+    # key: tag
+    # --
+    \`${1:json}:\"${2:$(string-inflection-underscore-function (go-ts-get-struct-fieldname))}\"\`$0
+#+end_src
+
+******* func
+#+begin_src conf :tangle ~/.config/emacs/snippets/go-ts-mode/func
+  # -*- mode: snippet -*-
+  # name: funcObj
+  # key: func
+  # --
+  /* $4 ${8:ToDo: Add documentation}
+  */
+  func ${1:(${2:x} ${3:Type})} ${4:Name}(${5:param string}) ${6:error} {
+       $0
+       ${7:$$(concat "return " (go-ts-get-initialised-return-types))}
+  }
+
+#+end_src
+
+******* If Err
+#+begin_src conf
+  # -*- mode: snippet -*-
+    # name: If Err
+    # key: ife
+    # --
+    if ${1:err} != nil {
+    ${2:$$(concat "return " (go-ts-get-initialised-return-types))}
+    }
+#+end_src
+
+******* Return statement
+#+begin_src conf :tangle ~/.config/emacs/snippets/go-ts-mode/return
+  # -*- mode: snippet -*-
+  # name: return with initialised values
+  # key: ret
+  # type: command
+  # --
+  (yas-expand-snippet (concat "return " (go-ts-get-initialised-return-types)))
+#+end_src
+
+******* Struct Field
+#+begin_src conf :tangle ~/.config/emacs/snippets/go-mode/structField
+    # -*- mode: snippet -*-
+    # name: Struct Field with optional Field Tag
+    # key: field
+    # --
+    ${1:fieldName} ${2:Type}$0
+#+end_src
+
+******* TestFunc
+#+begin_src emacs-lisp :tangle ~/.config/emacs/snippets/go-mode/test
+  # key: test
+  # --
+  func Test${1:XXX}(t *testing.T) {
+         $0
+  }
+#+end_src
+******* Convey Top level
+#+begin_src emacs-lisp :tangle ~/.config/emacs/snippets/go-mode/conveyt
+  # key: ConveyT
+  # --
+  Convey("${1:Description}", t, func() {
+         $0
+  })
+#+end_src
+******* Convey
+#+begin_src emacs-lisp :tangle ~/.config/emacs/snippets/go-mode/convey
+  # key: Convey
+  # --
+  Convey("${1:Description}", func() {
+         $0
+  })
+#+end_src
+
 
 *** Org
 A lot of this Ricing is lifted from  [[https://lucidmanager.org/productivity/ricing-org-mode/][Lucid Manager]].
@@ -657,7 +916,7 @@ This snippet adds a hook to =org-mode= buffers so that =efs/org-babel-tangle-con
   (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'peteches/org-babel-tangle-config)))
 #+end_src
 
-**  Add Terminal Emulations
+** Add Terminal Emulations
 *** Vterm
 [[https://github.com/akermu/emacs-libvterm][Vterm]] is a compiled terminal emulator for emacs that is faster than eshell.
 #+begin_src emacs-lisp
