@@ -1,0 +1,280 @@
+
+#+title: Peteches Hyprland config
+#+PROPERTY: header-args :tangle ~/.config/hypr/hyprland.conf :results silent :mkdirp yes
+
+* Hyprland config
+
+[[hyprland.org][Hyprland]] is a wayland compositor similar to sway but with dynamic tiling.
+All config options can be found on the [[wiki.hyprland.org][Wiki]].
+This is my config
+
+** Monitors
+
+The [[https://wiki.hyprland.org/Configuring/Monitors/][Monitors]] section of the wiki goes into detail about setting up monitors in a specific manner. I'm happy with the default and I'll override locally if needed.
+#+begin_src conf
+  monitor=,preferred,auto,1
+  monitor=DP-2,preferred,auto-left,1
+#+end_src
+
+** Variables
+*** Default env vars
+The [[https://wiki.hyprland.org/Configuring/Variables/][Variables]] Section of the wiki goes into detail about variable types and purposes.
+#+begin_src conf
+  env = XCURSOR_SIZE,24
+  env = QT_QPA_PLATFORMTHEME,qt5ct # change to qt6ct if you have that
+  env = NVD_BACKEND,direct+
+#+end_src
+*** Set video cards to use
+I will need to symlink integrated and nvidia cards to the paths below from /dev/dri/by-path using the instructions for [[https://wiki.hyprland.org/Configuring/Multi-GPU/][Multi-GPU]] setup on the wiki
+#+begin_src conf
+  env = ${WLR_DRM_DEVICES},${HOME}/.config/hypr/intel,${HOME}/.config/hypr/nvidia
+#+end_src
+*** Some common programs referenced elsewhere in the config
+#+begin_src conf
+  $terminal = alacritty
+  $fileManager = dolphin
+  $menu = wofi --show drun
+  $mainMod = SUPER
+#+end_src
+*** Inputs
+[[https://wiki.hyprland.org/Configuring/Variables/#input][Input variables]]
+#+begin_src conf
+  input {
+  kb_layout = us
+  kb_variant =
+  kb_model =
+  kb_options = ctrl:nocaps
+  kb_rules =
+
+  follow_mouse = 1
+
+  touchpad {
+  natural_scroll = no
+  }
+
+  sensitivity = 0 # -1.0 to 1.0, 0 means no modification.
+  }
+#+end_src
+*** General
+[[https://wiki.hyprland.org/Configuring/Variables/#general][General variables]]
+#+begin_src conf
+  general {
+
+  gaps_in = 5
+  gaps_out = 20
+  border_size = 2
+  col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
+  col.inactive_border = rgba(595959aa)
+
+  layout = dwindle
+
+  # Please see https://wiki.hyprland.org/Configuring/Tearing/ before you turn this on
+  allow_tearing = false
+  }
+#+end_src
+*** Decoration
+[[https://wiki.hyprland.org/Configuring/Variables/#decoration][Decoration Variables]]
+#+begin_src conf
+  decoration {
+
+  rounding = 10
+
+  blur {
+  enabled = true
+  size = 3
+  passes = 1
+  }
+
+  drop_shadow = yes
+  shadow_range = 4
+  shadow_render_power = 3
+  col.shadow = rgba(1a1a1aee)
+  }
+
+#+end_src
+*** Animations
+[[https://wiki.hyprland.org/Configuring/Variables/#animations][Animation Variables]] details of which can be found on the [[https://wiki.hyprland.org/Configuring/Animations/][Animations Wiki Page]]
+#+begin_src conf
+  animations {
+  enabled = yes
+
+  bezier = myBezier, 0.05, 0.9, 0.1, 1.05
+
+  animation = windows, 1, 7, myBezier
+  animation = windowsOut, 1, 7, default, popin 80%
+  animation = border, 1, 10, default
+  animation = borderangle, 1, 8, default
+  animation = fade, 1, 7, default
+  animation = workspaces, 1, 6, default
+  }
+#+end_src
+*** Gestures
+[[https://wiki.hyprland.org/Configuring/Variables/#gestures][Gesture Variables]]
+#+begin_src conf
+  gestures {
+  workspace_swipe = off
+  }
+
+#+end_src
+*** Misc
+[[https://wiki.hyprland.org/Configuring/Variables/#misc][Misc Variables]]
+#+begin_src conf
+  misc {
+  force_default_wallpaper = -1 # Set to 0 or 1 to disable the anime mascot wallpapers
+  }
+#+end_src
+*** Per Device inputs
+[[https://wiki.hyprland.org/Configuring/Keywords/#per-device-input-configs][Per Device]] Input configs are available, use `hyprctl devices` to get a list of available devices, then any [[https://wiki.hyprland.org/Configuring/Variables/#input][Input Variables]] can be used to configure that device.
+**** Example
+@#+begin_src conf :tangle no
+  device {
+  name = epic-mouse-v1
+  sensitivity = -0.5
+  }
+#+end_src
+** Layouts
+*** Master
+See [[https://wiki.hyprland.org/Configuring/Master-Layout/][Master Layout]] for more details
+#+begin_src conf
+  master {
+  new_status = inherit
+  }
+#+end_src
+*** Dwindle
+See [[https://wiki.hyprland.org/Configuring/Dwindle-Layout/][Dwindle Layout]] for more details
+#+begin_src conf
+  dwindle {
+  pseudotile = yes # master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
+  preserve_split = yes # you probably want this
+  }
+
+#+end_src
+** Startup Programs
+*** Notifications
+#+begin_src conf
+  exec-once=mako
+#+end_src
+*** Dbus
+#+begin_src conf
+  env = XDG_CURRENT_DESKTOP, Hyprland
+  env = XDG_SESSION_TYPE, wayland
+  env = XDG_SESSION_DESKTOP, Hyprland
+  exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+#+end_src
+*** Kill other Portals
+
+#+begin_src conf
+  exec-once = ~/.config/hypr/xdg-portal-hyprland
+#+end_src
+
+
+#+begin_src bash :tangle ~/.config/hypr/xdg-portal-hyprland
+  #!/bin/bash
+  sleep 1
+  killall xdg-desktop-portal-hyprland
+  killall xdg-desktop-portal-gnome
+  killall xdg-desktop-portal-wlr
+  killall xdg-desktop-portal
+  logger 'killed all xdg-desktop'
+  sleep 1
+  /usr/libexec/xdg-desktop-portal-hyprland &
+  logger 'xdg-desktop-portal-hyprland started'
+  sleep 2
+  /usr/libexec/xdg-desktop-portal &
+  logger 'xdg-desktop-portal started'
+#+end_src
+** Window Rules
+[[https://wiki.hyprland.org/Configuring/Window-Rules/][Window Rules]] are a powerful feature that allows hyprland to apply specfic rules to windows based on a variety of properties. For instance putting all windows with `- Youtube` in their title on a single monitor.
+*** Never maximise
+This rule ensures that windows never start maximised. This is a static event, so is only evaluated once when the window is opened. So we can maximise after window is launched
+#+begin_src conf
+  windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
+#+end_src
+** Key Bindings
+[[https://wiki.hyprland.org/Configuring/Binds/][Key Binds]] allow full keyboard control of the hyprland environment.
+*** Application startups
+#+begin_src conf :tangle ~/.config/hypr/hyprland.conf
+  bind = $mainMod, Return, exec, $terminal
+  bind = $mainMod, D, exec, $menu
+  bind = $mainMod, e, exec, emacsclient -c
+#+end_src
+**** Custom Wofi Stuff
+***** FireFox Profiles
+#+begin_src bash :tangle ~/.local/bin/firefoxProfile.sh :shebang #!/usr/bin/env bash
+
+  profile=$(cat ${HOME}/.mozilla/firefox/profiles.ini | awk --field-separator '=' '/^Name/ {print $2}' | wofi -d -p "Choose Firefox profile to launch")
+
+  nohup firefox-bin -P "${profile}" & >/dev/null 2>&1
+#+end_src
+
+#+begin_src conf
+  bind = $mainMod, b, exec, ${HOME}/.local/bin/firefoxProfile.sh
+#+end_src
+***** Password-store
+#+begin_src bash :shebang #!/usr/bin/env bash :tangle ~/.local/bin/passwordWofi.sh
+
+
+     password=$( find ${HOME}/.password-store -type f -name '*.gpg' -printf '%P\n' |  sed 's/.gpg//' | wofi -d -p "Select Password:")
+
+     fields=$( echo Password; pass show "${password}" | awk -F: 'NR>1{print $1}' )
+
+     field=$( echo -e "${fields}" | sed '/^\s*$/d'  | wofi -d -p "Choose entry:" )
+
+     case ${field} in
+         Password)
+             pass --clip "${password}"
+             ;;
+         ,*)
+          source <(sed -n '0,/END platform definable/p' $(which pass)) # gives access to the clip() function to copy data securely
+          clip $(pass show "${password}" | sed -n "/^${field}/s/^${field}\s*:\s*//p" ) "${password}"
+          ;;
+     esac
+#+end_src
+
+#+begin_src conf
+      bind = $mainMod, p, exec, ${HOME}/.local/bin/passwordWofi.sh
+#+end_src
+*** Window management
+#+begin_src conf
+  bind = $mainMod      , q, killactive
+  bind = $mainMod SHIFT, q, exit
+  bind = $mainMod SHIFT, f, togglefloating
+  bind = $mainMod      , f, fullscreen
+  bind = $mainMod      , t, togglesplit, # dwindle
+
+  # Move active window to a workspace with mainMod + SHIFT + [0-9]
+  bind = $mainMod SHIFT, 1, movetoworkspace, 1
+  bind = $mainMod SHIFT, 2, movetoworkspace, 2
+  bind = $mainMod SHIFT, 3, movetoworkspace, 3
+  bind = $mainMod SHIFT, 4, movetoworkspace, 4
+  bind = $mainMod SHIFT, 5, movetoworkspace, 5
+  bind = $mainMod SHIFT, 6, movetoworkspace, 6
+  bind = $mainMod SHIFT, 7, movetoworkspace, 7
+  bind = $mainMod SHIFT, 8, movetoworkspace, 8
+  bind = $mainMod SHIFT, 9, movetoworkspace, 9
+  bind = $mainMod SHIFT, 0, movetoworkspace, 10
+
+  # Move/resize windows with mainMod + LMB/RMB and dragging
+  bindm = $mainMod, mouse:272, movewindow
+  bindm = $mainMod, mouse:273, resizewindow
+#+end_src
+*** Window navigation
+#+begin_src conf
+  bind = $mainMod, left, movefocus, l
+  bind = $mainMod, right, movefocus, r
+  bind = $mainMod, up, movefocus, u
+  bind = $mainMod, down, movefocus, d
+#+end_src
+*** Workspace Navigation
+#+begin_src conf
+  bind = $mainMod, 1, workspace, 1
+  bind = $mainMod, 2, workspace, 2
+  bind = $mainMod, 3, workspace, 3
+  bind = $mainMod, 4, workspace, 4
+  bind = $mainMod, 5, workspace, 5
+  bind = $mainMod, 6, workspace, 6
+  bind = $mainMod, 7, workspace, 7
+  bind = $mainMod, 8, workspace, 8
+  bind = $mainMod, 9, workspace, 9
+  bind = $mainMod, 0, workspace, 10
+#+end_src
