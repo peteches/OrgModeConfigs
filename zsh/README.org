@@ -9,7 +9,7 @@ Zsh reads different [[https://zsh.sourceforge.io/Doc/Release/Files.html#Files-1]
 =ZDOTDIR= is the directory to search for shell startup files (.zshrc, etc), if not $HOME.
 * .zshenv
 :PROPERTIES:
-:header-args: :tangle ~/.config/zsh/.zshenv
+:header-args: :mkdirp yes :tangle ~/.config/zsh/.zshenv
 :END:
 
 =/etc/zshenv= is always the first file to be sourced, this cannot be changed and so should be minimal. After the global =/etc/zshenv= is read next is =${ZDOTDIR}/.zshenv=
@@ -194,16 +194,16 @@ end if with error if git not installed:
 Aliases are super useful and I like making theme
 
 *** LS
-So =ls= is fine an all, but I really quite like [[https://the.exa.website/][exa]], but apparenly my muscle memory isn't catching up!
+So =ls= is fine an all, but I really quite like [[https://the.eza.website/][exa]], but apparenly my muscle memory isn't catching up!
 #+begin_src bash
-  if { exa --help >/dev/null 2>&1; }; then
-      alias ll='exa --all --header --long --classify --git'
-      alias la='exa --all --git'
-      alias l='exa --header --classify --git --long'
-      alias ls='exa --header --long --git'
-      alias ks='exa' # yeah another typo fix
+  if { eza --help >/dev/null 2>&1; }; then
+      alias ll='eza --all --header --long --classify --git'
+      alias la='eza --all --git'
+      alias l='eza --header --classify --git --long'
+      alias ls='eza --header --long --git'
+      alias ks='eza' # yeah another typo fix
   else
-      echo "You should install exa to get good ls's" >&2
+      echo "You should install eza to get good ls's" >&2
   fi
 #+end_src
 
