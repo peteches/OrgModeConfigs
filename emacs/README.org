@@ -1,7 +1,10 @@
 #+title: Peteches Emacs Stuff
-#+PROPERTY: header-args:emacs-lisp :tangle ~/.config/emacs/init.el
-#+PROPERTY: header-args :results silent :mkdirp yes
 
+* EMACS Config
+:PROPERTIES:
+:header-args: :results silent :mkdirp yes
+:header-args:emacs-lisp: :tangle ~/.config/emacs/init.el
+:END:
 
 ** Basics
 
@@ -124,17 +127,17 @@ On fist use on after the package is installed you need to run
     :ensure nil ; dired is not installable as it's builtin
     :commands (dired dired-jump)
     :config
-    (if (executable-find "exa")
-  (message "setting insert-directory-program to 'exa'")
-        (setq insert-directory-program (executable-find "exa")))
+    (if (executable-find "eza")
+  (message "setting insert-directory-program to 'eza'")
+  (setq insert-directory-program (executable-find "eza")))
     :custom
     ((dired-dwim-target t)
      (dired-hide-details-hide-symlink-targets t)
-     (if (executable-find "exa")
-         (message "setting list regex and exa list switches")
-         (setq
-               directory-listing-before-filename-regexp ".*[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] \\([01][0-9]\\|2[0-3]\\):[0-5][0-9] +"
-               dired-listing-switches "--classify --long --all --sort=Name --group-directories-first --time-style=long-iso --no-user"))))
+     (if (executable-find "eza")
+	 (message "setting list regex and eza list switches")
+	 (setq
+	       directory-listing-before-filename-regexp ".*[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] \\([01][0-9]\\|2[0-3]\\):[0-5][0-9] +"
+	       dired-listing-switches "--classify --long --all --sort=Name --group-directories-first --time-style=long-iso --no-user"))))
 #+end_src
 
 **** Fancy Icons
@@ -346,6 +349,7 @@ Install hydra first
  #+end_src
 
 ** I am EVIL
+
 *** First lets make <Esc> Work like it should :P
 #+begin_src emacs-lisp
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -494,13 +498,6 @@ Try these commands with =M-x=:
      :prefix lsp-keymap-prefix
      "d" '(dap-hydra t :wk "debugger")))
 
-  (use-package dap-ui
-    :ensure t
-    :config
-    (dap-mode 1)
-    (dap-ui-mode 1)
-    )
-
 #+end_src
 
 **** String Inflection
@@ -510,15 +507,33 @@ The [[https://github.com/akicho8/string-inflection][String Inflection]] package 
     :ensure t
 )
 #+End_src
-
 *** Docker
 I use docker a lot so lets have a docker mode
 #+begin_src emacs-lisp
   (use-package dockerfile-mode
   :ensure t)
 #+end_src
+*** Common Lisp
+I want to get better with general lisp dialects so starting with common lisp seems natural
+**** Slime
+#+begin_src emacs-lisp
+  (use-package slime
+    :ensure t
+    :hook (
+	   (lisp-mode . (lambda () (slime-mode t)))
+	   (inferior-lisp-mode . (lambda () (slime-mode t)))
+	   )
+    :config
+    (setq inferior-lisp-program "sbcl"))
+
+#+end_src
+
 *** Go
 I like Golang so lets set it up
+**** Add gobin to path
+#+begin_src emacs-lisp
+(add-to-list 'exec-path (shell-command-to-string "go env GOBIN | tr -d '\n'"))
+#+end_src
 **** Install go-mode
 #+begin_src emacs-lisp
   (use-package go-mode
@@ -744,7 +759,15 @@ I want to retrieve the name of a struct field from the line the cursor is curren
          $0
   })
 #+end_src
+*** Yaml
+**** Install yaml-mode
 
+#+begin_src emacs-lisp
+  (use-package yaml-mode
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.yml\\'" .yaml-mode)))
+#+end_src
 
 *** Org
 A lot of this Ricing is lifted from  [[https://lucidmanager.org/productivity/ricing-org-mode/][Lucid Manager]].
@@ -1015,7 +1038,7 @@ emerge net-mail/mu net-mail/isync
 
 
 **** Create mbsync config
-First need to sync mail, Using mb sync, RC Config example
+First need to sync mail, Using mb sync, RC Config ezample
 #+begin_src conf :tangle ~/.mbsyncrc :results nil
   IMAPAccount fastmail
   Host imap.fastmail.com
@@ -1060,7 +1083,7 @@ mu index --muhome ~/Mail/.mu-cache
 *** Configure Emacs
 
 **** Install mu4e
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package mu4e
     :ensure nil
     ; This should probably only be used for Mac systems, but it doesn't hurt to include it for non-mac systems
