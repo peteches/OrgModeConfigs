@@ -1,9 +1,11 @@
 
 #+title: Peteches Hyprland config
-#+PROPERTY: header-args :tangle ~/.config/hypr/hyprland.conf :results silent :mkdirp yes
+#+PROPERTY: header-args :results silent :mkdirp yes
 
 * Hyprland config
-
+:PROPERTIES:
+:header-args: :tangle ~/.config/hypr/hyprland.conf :mkdir yes
+:END:
 [[hyprland.org][Hyprland]] is a wayland compositor similar to sway but with dynamic tiling.
 All config options can be found on the [[wiki.hyprland.org][Wiki]].
 This is my config
@@ -13,6 +15,7 @@ This is my config
 The [[https://wiki.hyprland.org/Configuring/Monitors/][Monitors]] section of the wiki goes into detail about setting up monitors in a specific manner. I'm happy with the default and I'll override locally if needed.
 #+begin_src conf
   monitor=,preferred,auto,1
+  monitor=eDP-1,preffered,auto,2
   monitor=DP-2,preferred,auto-left,1
 #+end_src
 
@@ -153,6 +156,8 @@ See [[https://wiki.hyprland.org/Configuring/Dwindle-Layout/][Dwindle Layout]] fo
 *** Notifications
 #+begin_src conf
   exec-once=mako
+  exec-once=waybar
+  exec-once=hypridle
 #+end_src
 *** Dbus
 #+begin_src conf
@@ -197,6 +202,7 @@ This rule ensures that windows never start maximised. This is a static event, so
   bind = $mainMod, Return, exec, $terminal
   bind = $mainMod, D, exec, $menu
   bind = $mainMod, e, exec, emacsclient -c
+  bind = $mainMod, l, exec, loginctl lock-session
 #+end_src
 **** Custom Wofi Stuff
 ***** FireFox Profiles
@@ -277,4 +283,87 @@ This rule ensures that windows never start maximised. This is a static event, so
   bind = $mainMod, 8, workspace, 8
   bind = $mainMod, 9, workspace, 9
   bind = $mainMod, 0, workspace, 10
+#+end_src
+
+* Hyprland utilities
+
+** Hyprlock
+:PROPERTIES:
+:header-args: :mkdirp yes :tangle ~/.config/hypr/hyprlock.conf
+:END:
+[[https://wiki.hyprland.org/Hypr-Ecosystem/hyprlock/][Hyprlock]] is a screen lock utility
+*** General
+#+begin_src conf
+  general {
+          disable_loading_bar = true
+          hide_cursor = true
+          grace = 10
+          no_fade_in = true
+          ignore_empty_input = true
+          immediate_render = true
+  }
+#+end_src
+*** BackGround
+#+begin_src conf
+  background {
+    path = screenshot
+    color = rgba(0,0,0,0)
+    blur_passes = 1
+    blur_size = 10
+    noise = 0.0117
+    contrast = 0.8916
+    brightness = 0.8172
+    vibrancy = 0.1696
+    vibrancy_darkness = 0.0
+  }
+#+end_src
+
+** Hypridle
+:PROPERTIES:
+:header-args: :mkdirp yes :tangle ~/.config/hypr/hypridle.conf
+:END:
+
+[[https://wiki.hyprland.org/Hypr-Ecosystem/hypridle/][Hypridle]] is an idle management daemon for Hyprland
+
+*** General
+#+begin_src conf
+  general {
+          lock_cmd = pidof hyprlock || hyprlock
+          before_sleep_cmd = loginctl lock-session
+          after_sleep_cmd  = hyprctl dispatch dpms on && sudo systemctl restart wpa_supplicant@wlp0s20f3
+        }
+#+end_src
+
+*** Turn off keyboard backlight
+#+begin_src conf
+
+          listener {
+        timeout = 150
+        on-timeout = brightnessctl -sd rgb:kbd_backlight set 0
+        on-resume = brightnessctl -rd rgb:kbd_backlight
+    }
+#+end_src
+
+#+begin_src conf
+  listener {
+           timeout = 150
+           on-timeout = brightnessctl -s set 10
+           on-resume = brightnessctl -r
+  }
+#+end_src
+
+*** Lock screen after 5 minutes
+#+begin_src conf
+  listener {
+         timeout = 300
+         on-timeout = loginctl lock-session
+  }
+#+end_src
+
+*** Suspend after 30 minutes
+#+begin_src conf
+  listener {
+         timeout = 1800
+         on-timeout = systemctl suspend
+         }
 #+end_src

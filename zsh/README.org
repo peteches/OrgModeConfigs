@@ -392,6 +392,14 @@ Search Aliases. For when you can't remember what aliases are doing, or you think
     alias | grep -E "$pat"
 #+end_src
 
+** Accept Keyword
+In Gentoo many packages need accpet keywords, this is a shortcut
+#+begin_src bash :tangle ~/.config/zsh/functions/accept-amd64
+  packages=($@)
+   for pkg in ${packages[@]}; do
+       echo "${pkg} ~amd64" | sudo tee -a /etc/portage/package.accept_keywords/${pkg##*/}
+   done
+#+end_src
 ** Hist
 Using history is great, but I find the native integration a bit rubbish when trying to search for a history item.
 
