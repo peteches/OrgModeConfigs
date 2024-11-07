@@ -1,4 +1,4 @@
-#+title: Peteches Emacs Stuff
+FiraCode Nerd Font Mono#+title: Peteches Emacs Stuff
 
 * EMACS Config
 :PROPERTIES:
@@ -14,13 +14,11 @@ These will be needed for most of the rest of the config so best set it up first.
 
 #+begin_src emacs-lisp
   (require 'package)
-  (progn
         ;; load emacs 24's package system. Add MELPA repository.
         (require 'package)
-        (add-to-list
-         'package-archives
-         '("melpa" . "https://melpa.org/packages/")
-         t))
+        (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+         ("org" . "https://orgmode.org/elpa")
+         ("elpa" . "https://elpa.gnu.org/packages")))
   (package-initialize)
   (unless package-archive-contents
     (package-refresh-contents))
@@ -144,15 +142,6 @@ On fist use on after the package is installed you need to run
 #+begin_src emacs-lisp
   (use-package all-the-icons-dired
   :hook (dired-mode . all-the-icons-dired-mode))
-#+end_src
-
-*** Configure Fonts
-#+begin_src emacs-lisp :tangle no # disable while testing nerd-icons font
-  (peteches/sys-exe gnu/linux
-    (add-to-list 'default-frame-alist '(font . h"))
-    (set-face-attribute 'default nil :font "FiraCode Nerd Font Mono" :height 110))
-  (peteches/sys-exe darwin
-    (set-face-attribute 'default nil :font "Menlo" :height 110))
 #+end_src
 
 *** Snippets
@@ -795,12 +784,56 @@ Org is installed by default, but this makes sure we're on the latest version. Al
 **** Nice Bullets
 [[https://github.com/integral-dw/org-superstar-mode][Org-superstar]] will make bullets and lists much nicer to look at
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package org-superstar
   :config
   (setq org-superstar-special-todo-items t)
   (add-hook 'org-mode-hook (lambda ()
 			     (org-superstar-mode 1))))
+#+end_src
+
+but I am experimenting with [[https://github.com/minad/org-modern][org-modern]] now
+
+#+begin_src emacs-lisp
+  (use-package org-modern
+  :config
+  (modify-all-frames-parameters
+   '((right-divider-width . 10)
+     (internal-border-width . 10)))
+  (dolist (face '(window-divider
+                  window-divider-first-pixel
+                  window-divider-last-pixel))
+    (face-spec-reset-face face)
+    (set-face-foreground face (face-attribute 'default :background)))
+  (set-face-background 'fringe (face-attribute 'default :background))
+
+  (setq
+   ;; Edit Settings
+   org-auto-align-tags nil
+   org-tags-column 0
+   org-catch-invisible-edits 'show-and-error
+   org-special-ctrl-a/e t
+   org-insert-heading-respect-content t
+
+   ;; Org styling
+   org-hide-emphasis-markers t
+   org-pretty-entities t
+
+   ;; Agenda Styling
+   org-agenda-tags-column 0
+   org-agenda-block-separator ?-
+   org-agenda-time-grid
+   '((daily today require-timed)
+     (800 1000 1200 1400 1600 1800 2000)
+     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+   org-agenda-current-time-string
+   "◀── now ─────────────────────────────────────────────────")
+
+  ;;
+  (setq org-ellipsis "…")
+  (set-face-attribute 'org-ellipsis nil :inherit 'default :box nil)
+  (global-org-modern-mode))
+
 #+end_src
 
 **** Use mixed-pitch package
@@ -814,9 +847,9 @@ The [[https://gitlab.com/jabranham/mixed-pitch][mixed pitch package]], by Alex B
                               (set-face-attribute 'fixed-pitch nil :font "PT Mono")
                               (set-face-attribute variable-pitch nil :font "Georgia")))
   (peteches/sys-exe "gnu/linux" (
-                                 (set-face-attribute default nil :font "FiraCode Nerd Font Mono" :height 230)
-                                 (set-face-attribute 'fixed-pitch nil :font "FiraCode Nerd Font Mono")
-                                 (set-face-attribute 'variable-pitch nil :font "FiraCode Nerd Font"))))
+                                 (set-face-attribute default nil :font "Iosevka" :height 230)
+                                 (set-face-attribute 'org-modern-symbol nil :family "Iosevka")
+                                 (set-face-attribute 'variable-pitch nil :font "Iosevka Aile"))))
   (add-hook 'mixed-pitch-mode #'solaire-mode-reset)
 #+end_src
 **** Use a postframe for company mode
