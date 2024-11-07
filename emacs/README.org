@@ -781,6 +781,30 @@ Org is installed by default, but this makes sure we're on the latest version. Al
     (make-directory (file-name-directory ele))))
 
 #+end_src
+**** Org Roam
+[[https://orgroam.com][Org-Roam]] is note editing software extension for orgmode
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :ensure t
+    :init
+    (setq org-roam-v2-ack t)
+    :custom
+    (org-roam-directory "~/RoamNotes")
+    (org-roam-completion-everywhere t)
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n i" . org-roam-node-insert)
+           :map org-mode-map
+           ("C-M-i" . completion-at-point)
+           :map org-roam-dailies-map
+           ("Y" . org-roam-dailies-capture-yesterday)
+           ("T" . org-roam-dailies-capture-tomorrow))
+    :bind-keymap
+    ("C-c n d" . org-roam-dailies-map)
+    :config
+    (require 'org-roam-dailies)
+    (org-roam-setup))
+#+end_src
 **** Nice Bullets
 [[https://github.com/integral-dw/org-superstar-mode][Org-superstar]] will make bullets and lists much nicer to look at
 
