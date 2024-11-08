@@ -11,10 +11,10 @@
 *** Install from Gentoo
 #+begin_src bash :tangle no
   # enable required use flags
-  euse -E -p x11-misc/polybar alsa curl i3wm ipc mpd network pulseaudio
+  sudo euse -E -p x11-misc/polybar alsa curl i3wm ipc mpd network pulseaudio
   # unmask notify-send utility
   echo -e 'x11-misc/tinynotify-send ~amd64\nx11-libs/libtinynotify ~amd64\nx11-libs/libtinynotify-cli ~amd64' | sudo tee /etc/portage/package.accept_keywords/tinynotify-send
-  emerge x11-misc/polybar x11-misc/tinynotify-send x11-apps/xrandr net-wireless/iw
+  sudo emerge x11-misc/polybar x11-misc/tinynotify-send x11-apps/xrandr net-wireless/iw
 #+end_src
 ** Polybar needs a startup script to keep everything clean
 #+begin_src bash :tangle ~/.local/bin/polybar.sh :mkdirp yes :shebang #!/bin/bash

@@ -14,10 +14,7 @@
 
 ** Install for Gentoo
 #+begin_src bash :tangle no
-  euse -E -p x11-misc/rofi drun windowmode
-  euse -E -p x11-misc/picuom dbus opengl
-  euse -E -p x11-misc/polybar alsa curl i3wm ipc mpd network pulseaudio
-  emerge media-gfx/maim x11-apps/xsetroot x11-apps/xbacklight media-sound/playerctl app-misc/jq x11-misc/picom x11-misc/xautolock x11-misc/numlockx x11-misc/polybar x11-misc/rofi
+  emerge media-gfx/maim  media-sound/playerctl app-misc/jq
 
   tmpdir=$(mktemp -d)
   git clone --depth=1 https://github.com/adi1090x/polybar-themes.git ${tmpdir}
@@ -35,6 +32,7 @@
 
 #+begin_src conf
   set $mod Mod4
+
 #+end_src
 ** Font
 #+begin_src conf
@@ -53,8 +51,6 @@ whilst i3wm focuses on tiled windows occasionally it's useful to have some float
 #+end_src
 ** Some misc shortcuts
 #+begin_src conf
-  bindsym XF86MonBrightnessUp exec xbacklight -inc 10
-  bindsym XF85MonBrightnessDown exec xbacklight -dec 10
   bindsym Print --release exec "maim --hidecursor --select ~/Pictures/screenshots/$(date +%s).png"
   bindsym XF86AudioPlay exec playerctl play-pause
   bindsym XF86AudioPause exec playerctl play-pause
@@ -82,8 +78,8 @@ whilst i3wm focuses on tiled windows occasionally it's useful to have some float
 #+end_src
 
 #+begin_src conf
-  bindsym $mod+d exec rofi -modi run -show run
-  bindsym $mod+w exec rofi -modi workspace:${HOME}/.config/rofi/workspaces.sh -show workspace
+  bindsym $mod+d exec wofi --show run
+  bindsym $mod+w exec wofi -modi workspace:${HOME}/.config/rofi/workspaces.sh -show workspace
 #+end_src
 ** Focusing
 #+begin_src conf
@@ -132,8 +128,8 @@ whilst i3wm focuses on tiled windows occasionally it's useful to have some float
           bindsym $mod+Shift+minus move scratchpad
 
 #+end_src
-*** Workspace assignments
-#+begin_src conf
+*** Workspace assignmentsl
+#+begin_src conf :tangle no
   assign [class="Slack"] workspace $comms
          assign [class="Spotify"] move scratchpad
 #+end_src
@@ -170,7 +166,7 @@ whilst i3wm focuses on tiled windows occasionally it's useful to have some float
           bindsym $mod+Control+r mode "resize"
 #+end_src
 ** Theme Stuff
-#+begin_src conf
+#+begin_src conf :tangle no
           hide_edge_borders both
 
 set_from_resource  $bgcolor            i3wm.background #2f343f
@@ -191,22 +187,6 @@ client.urgent            $urgentbgcolor    $urgentbgcolor    $textcolor         
 ** Startup
 *** Config
 #+begin_src conf
-  exec --no-startup-id dunst
-  exec  --no-startup-id picom --daemon
-  exec --no-startup-id  numlockx on
-  exec --no-startup-id  xautolock -detectsleep -time 10 -locker 'i3lock-extra -m pixelize --pixelize-scale 20' -notify 30 -notifier 'notify-send -u critical -t 10000 -- "locking screen in 30 seconds"'
-  exec  --no-startup-id xsetroot -solid "#999999"
-  exec --no-startup-id ~/.local/bin/polybar.sh
-#+end_src
-*** Create the polybar startup script
-#+begin_src bash :shebang #!/bin/bash :tangle ~/.local/bin/polybar.sh
-
-  killall -q polybar
-
-  while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done
-
-  for x in $(polybar --list-monitors | cut -d: -f1); do
-      MONITOR=${x} polybar -q main -c ~/.config/polybar/forest/config.ini &
-  done
-
+  exec --no-startup-id mako
+  exec --no-startup-id sfwbar
 #+end_src
