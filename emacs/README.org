@@ -1,8 +1,12 @@
-FiraCode Nerd Font Mono#+title: Peteches Emacs Stuff
+:PROPERTIES:
+:header-args: :results silent :mkdirp yes :eval no
+:END:
++title: Peteches Emacs Stuff
+
+
 
 * EMACS Config
 :PROPERTIES:
-:header-args: :results silent :mkdirp yes
 :header-args:emacs-lisp: :tangle ~/.config/emacs/init.el
 :END:
 
@@ -1290,4 +1294,69 @@ mu index --muhome ~/Mail/.mu-cache
 Emacs has a bug tracking package! how cool!
 #+begin_src emacs-lisp
 (use-package debbugs)
+#+end_src
+
+
+* Systemd units
+
+** User Service
+#+begin_src conf :mkdirp yes :tangle ~/.config/systemd/user/emacs.service
+  [Unit]
+  Description=Emacs text editor
+  Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
+
+  [Service]
+  Type=notify
+  ExecStart=/usr/bin/emacs --fg-daemon
+
+  # Emacs will exit with status 15 after having received SIGTERM, which
+  # is the default "KillSignal" value systemd uses to stop services.
+  SuccessExitStatus=15
+
+  # The location of the SSH auth socket varies by distribution, and some
+  # set it from PAM, so don't override by default.
+  # Environment=SSH_AUTH_SOCK=%t/keyring/ssh
+  Restart=on-failure
+
+  [Install]
+  WantedBy=default.target
+#+end_src
+
+#+begin_src bash :eval yes
+  systemctl --user enable --now emacs.service
+#+end_src
+
+
+** Reload config when changes
+This watches for changes to the config file
+#+begin_src conf :mkdirp yes :tangle ~/.config/systemd/user/emacsConfigWatcher.path
+  [Unit]
+  Description=Watches the emacs config file for changes and triggers restart of the deamon.
+
+  [Path]
+  PathModified=%h/.config/emacs/init.el
+  Unit=ReloadEmacsConfig.service
+
+  [Install]
+  WantedBy=default.target
+
+#+end_src
+
+And triggers this to tell emacs to reload config
+#+begin_src conf :mkdirp yes :tangle ~/.config/systemd/user/ReloadEmacsConfig.service
+  [Unit]
+  Description=Reloads the emacs config in the service
+
+  [Service]
+  Type=oneshot
+  ExecStart=emacsclient --eval '(load-file "~/.config/emacs/init.el")'
+
+  [Install]
+  WantedBy=defaul.target
+
+#+end_src
+
+#+begin_src bash :eval yes :tangle no
+  systemctl --user daemon-reload
+  systemctl --user enable emacsConfigWatcher.path
 #+end_src

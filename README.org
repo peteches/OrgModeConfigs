@@ -1,0 +1,111 @@
+* OrgModeConfigs
+:PROPERTIES:
+:header-args: :mkdirp yes :eval no
+:END:
+All my configs, but in ORG Mode!
+
+** AutoTangle
+As this is shared amongst multiple machines I want to automate keeping them in sync.
+
+*** Systemd Services
+****  CloneOrgModeConfigs.service
+#+begin_src conf :mkdirp yes :tangle ~/.config/systemd/user/CloneOrgModeConfigs.service
+  [Unit]
+  Description=Clone OrgModeConfigs repo.
+  Before=CreateWorkTreeOrgModeConfigs.service
+  ConditionPathExists=!%h/area_51/github.com/peteches/OrgModeConfigs.git
+
+  [Service]
+  Type=oneshot
+  WorkingDirectory=%h/area_51/github.com/peteches
+  ExecStart=git clone --bare git@github.com:peteches/OrgModeConfigs.git OrgModeConfigs.git
+#+end_src
+**** CreateWorkTreeOrgModeConfigs.service
+#+begin_src conf :tangle ~/.config/systemd/user/CreateWorkTreeOrgModeConfigs.service
+  [Unit]
+  Description=Create main worktree checkout in OrgModeConfigs repo.
+  Before=PullOrgModeConfigs.service
+  After=CloneOrgModeConfigs.service
+  Requires=CloneOrgModeConfigs.service
+  ConditionPathExists=!%h/area_51/github.com/peteches/OrgModeConfigs.git/checkouts/main
+
+  [Service]
+  Type=oneshot
+  WorkingDirectory=%h/area_51/github.com/peteches/OrgModeConfigs.git
+  ExecStart=git worktree add checkouts/main main
+
+#+end_src
+****  PullOrgModeConfigs.service
+#+begin_src conf :mkdirp yes :tangle ~/.config/systemd/user/PullOrgModeConfigs.service
+  [Unit]
+  Description=git pull remote changes for the OrgModeConfigs repo
+  After=CloneOrgModeConfigs.service
+  Requires=CreateWorkTreeOrgModeConfigs.service
+
+  [Service]
+  Type=oneshot
+  WorkingDirectory=%h/area_51/github.com/peteches/OrgModeConfigs.git/checkouts/main
+  ExecStart=git pull origin main
+
+  [Install]
+  WantedBy=default.target
+
+#+end_src
+
+**** TangleOrgModeConfigs.service
+Define a shell script to tangle and execute all org files
+#+begin_src bash :mkdirp yes :tangle ~/.local/bin/tangleOrgModeConfigs.sh :shebang #!/bin/bash
+
+  orgPath=${1}
+
+  if [[ ! -d ${orgPath} ]]; then
+      echo "$0 pathToOrgConfigDir" >&2
+      echo "${orgPath} Does not exist." >&2
+      exit 1
+  fi
+
+  find ${orgPath} -type f -name '*.org' \
+      | xargs emacs --quick --batch --eval "(progn (require 'ob-tangle) (dolist (file command-line-args-left) (with-current-buffer (find-file-noselect file) (org-babel-tangle) (org-babel-execute-buffer))))"
+
+#+end_src
+
+#+begin_src conf :mkdirp yes :tangle ~/.config/systemd/user/TangleOrgModeConfigs.service
+  [Unit]
+  Description=Will find all .org files in OrgModeConfigs repo and run org-babel-tangle on them
+  After=PullOrgModeConfigs.service
+  Requires=PullOrgModeConfigs.service
+
+  [Service]
+  Type=oneshot
+  WorkingDirectory=%h/area_51/github.com/peteches/OrgModeConfigs.git/checkouts/main
+  ExecStart=%h/.local/bin/tangleOrgModeConfigs.sh .
+
+  [Install]
+  WantedBy=default.target
+
+#+end_src
+
+*** Systemd Timers
+
+**** TangleOrgModeConfigs.timer
+:PROPERTIES:
+:header-args: :mkdirp yes :eval no :results silence
+:END:
+#+begin_src conf :mkdirp yes :tangle ~/.config/systemd/user/TangleOrgModeConfigs.timer
+  [Unit]
+  Description=Tangle all configs every so often
+
+  [Timer]
+  OnCalendar=daily
+  Persistent=True
+
+  [Install]
+  WantedBy=timers.target
+#+end_src
+
+Now to enable the timer
+#+begin_src bash :tangle no :eval yes
+  systemctl --user daemon-reload
+  systemctl --user start TangleOrgModeConfigs.service
+  systemctl --user start TangleOrgModeConfigs.timer
+#+end_src
