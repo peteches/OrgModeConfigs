@@ -947,7 +947,10 @@ Add ox-extra
     :config
     (add-to-list 'org-structure-template-alist '("mmd" . "src mermaid :file ./mermaid.png")))
 #+end_src
-
+****** CSS
+#+begin_src emacs-lisp :eval yes
+  (add-to-list 'org-structure-template-alist '("css" . "src css"))
+#+end_src
 *****  load languages
 Add Babel language support this is done after installing external packages so dependencies exist
 #+begin_src emacs-lisp
