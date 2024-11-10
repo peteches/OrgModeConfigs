@@ -54,7 +54,7 @@ As this is shared amongst multiple machines I want to automate keeping them in s
 
 **** TangleOrgModeConfigs.service
 Define a shell script to tangle and execute all org files
-#+begin_src bash :mkdirp yes :tangle ~/.local/bin/tangleOrgModeConfigs.sh :shebang #!/bin/bash
+#+begin_src bash :mkdirp yes :tangle ~/.local/bin/tangleOrgModeConfigs.sh :shebang #!/bin/bash :eval no
 
     orgPath=${1}
 
