@@ -342,6 +342,9 @@ Install hydra first
  #+end_src
 
 ** I am EVIL
+:PROPERTIES:
+:header-args:emacs-lisp: :tangle no
+:END:
 
 *** First lets make <Esc> Work like it should :P
 #+begin_src emacs-lisp
