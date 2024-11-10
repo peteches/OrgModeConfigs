@@ -4,7 +4,7 @@
 
 * Hyprland config
 :PROPERTIES:
-:header-args: :tangle ~/.config/hypr/hyprland.conf :mkdir yes
+:header-args: :tangle ~/.config/hypr/hyprland.conf :mkdir yes :eval no
 :END:
 [[hyprland.org][Hyprland]] is a wayland compositor similar to sway but with dynamic tiling.
 All config options can be found on the [[wiki.hyprland.org][Wiki]].
@@ -129,7 +129,7 @@ I will need to symlink integrated and nvidia cards to the paths below from /dev/
 *** Per Device inputs
 [[https://wiki.hyprland.org/Configuring/Keywords/#per-device-input-configs][Per Device]] Input configs are available, use `hyprctl devices` to get a list of available devices, then any [[https://wiki.hyprland.org/Configuring/Variables/#input][Input Variables]] can be used to configure that device.
 **** Example
-@#+begin_src conf :tangle no
+#+begin_src conf :tangle no
   device {
   name = epic-mouse-v1
   sensitivity = -0.5
@@ -289,7 +289,7 @@ This rule ensures that windows never start maximised. This is a static event, so
 
 ** Hyprlock
 :PROPERTIES:
-:header-args: :mkdirp yes :tangle ~/.config/hypr/hyprlock.conf
+:header-args: :mkdirp yes :tangle ~/.config/hypr/hyprlock.conf :eval no
 :END:
 [[https://wiki.hyprland.org/Hypr-Ecosystem/hyprlock/][Hyprlock]] is a screen lock utility
 *** General
@@ -320,7 +320,7 @@ This rule ensures that windows never start maximised. This is a static event, so
 
 ** Hypridle
 :PROPERTIES:
-:header-args: :mkdirp yes :tangle ~/.config/hypr/hypridle.conf
+:header-args: :mkdirp yes :tangle ~/.config/hypr/hypridle.conf :eval no
 :END:
 
 [[https://wiki.hyprland.org/Hypr-Ecosystem/hypridle/][Hypridle]] is an idle management daemon for Hyprland

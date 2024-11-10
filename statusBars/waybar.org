@@ -1,11 +1,11 @@
 #+title: Waybar Config
-#+PROPERTY: header-args :comments both :results silent :mkdirp yes
+#+PROPERTY: header-args :comments both :results silent :mkdirp yes :eval no
 
 [[https://github.com/Alexays/Waybar][Waybar]] is a highly customizable Wayland status bar for Wlroots based compositors.
 
 * Config
 :PROPERTIES:
-:header-args: :tangle ~/.config/waybar/config.jsonc :mkdirp yes
+:header-args+: :tangle ~/.config/waybar/config.jsonc
 :END:
 [[https://github.com/Alexays/Waybar/wiki/Configuration][waybar Config]] is a jsonc file
 

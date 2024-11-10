@@ -1,5 +1,5 @@
 #+title: Peteches Polybar Stuff
-#+PROPERTY: header-args  :comments both :results silent :mkdirp yes
+#+PROPERTY: header-args  :comments both :results silent :mkdirp yes :eval no
 
 [[https://polybar.github.io][Polybar]] is a fast and easy to use tool for creating status bars.
 
@@ -17,7 +17,7 @@
   sudo emerge x11-misc/polybar x11-misc/tinynotify-send x11-apps/xrandr net-wireless/iw
 #+end_src
 ** Polybar needs a startup script to keep everything clean
-#+begin_src bash :tangle ~/.local/bin/polybar.sh :mkdirp yes :shebang #!/bin/bash
+#+begin_src bash :tangle ~/.local/bin/polybar.sh :shebang #!/bin/bash
 
   #wait for the process to shutdown.
   polyBarPID=$(pgrep -x polybar)

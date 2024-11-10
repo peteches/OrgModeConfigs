@@ -1,5 +1,5 @@
 #+title: Peteches Git Stuff
-#+PROPERTY: header-args :results silent :mkdirp yes :comments both
+#+PROPERTY: header-args :results silent :mkdirp yes :comments both :eval no
 
 
 * Prerequisits:
@@ -13,7 +13,7 @@ To install pre-commit o Gentoo:
 [[https://github.com/github/gitignore][GitHub Gitignore]] repo has many great gitignore files for all sorts of stuff, so I'm +stealing+ making use of the good effort they have already put in.
 This snippet uses [[https://www.gnu.org/software/emacs/manual/html_node/org/Noweb-Reference-Syntax.html][NoWeb]] to write a babel function that gets the specified gitignore from [[https://github.com/github/gitignore]]
 #+name: getIgnores
-#+begin_src bash :results output :var ignoreFile=""
+#+begin_src bash :results output :var ignoreFile="" :eval yes
   echo "# From https://raw.githubusercontent.com/github/gitignore/main/"${ignoreFile}
   curl -vvv https://raw.githubusercontent.com/github/gitignore/main/${ignoreFile}
 

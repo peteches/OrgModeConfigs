@@ -1,6 +1,6 @@
 #+title: Peteches Vimb Stuff
-#+PROPERTY: header-args:conf :tangle ~/.config/vimb/config
-#+PROPERTY: header-args :results silent :mkdirp yes
+#+PROPERTY: header-args:conf :tangle ~/.config/vimb/config :eval no
+#+PROPERTY: header-args :results silent :mkdirp yes :eval no
 
 [[https://fanglingsu.github.io/vimb/man.html][vimb]] is a modal web browser based on vim, as the name suggests VimBrowser!
 
@@ -31,7 +31,7 @@ Enable or disable accelerated 2D canvas. When accelerated 2D canvas is enabled, 
   set accelerated-2d-canvas=true
 #+end_src
 ** allow-file-access-from-file-urls (bool)
-Indicates whether file access is allowed from file URLs. By default, when something is loaded using a file URI, cross origin requests to other file resources are not allowed.
+Indicates whether file access is allowed from file URLps. By default, when something is loaded using a file URI, cross origin requests to other file resources are not allowed.
 #+begin_src conf
 set allow-file-access-from-file-urls=false
 #+end_src

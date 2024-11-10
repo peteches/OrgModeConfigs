@@ -1,3 +1,6 @@
+:PROPERTIES:
+:header-args: :eval no :tangle no :results silent :mkdirp yes
+:END:
 #+title: Peteches i3wm Stuff
 
 [[https://i3wm.org/docs/userguide.html][i3wm]] is a tiling window manager for linux / X11. It's Ace!
@@ -26,7 +29,7 @@
 
 * Config
 :PROPERTIES:
-:header-args: :results silent :mkdirp yes :tangle ~/.config/i3/config
+:header-args+: :tangle ~/.config/i3/config
 :END:
 ** Set Meta as the modifier key
 

@@ -56,16 +56,32 @@ As this is shared amongst multiple machines I want to automate keeping them in s
 Define a shell script to tangle and execute all org files
 #+begin_src bash :mkdirp yes :tangle ~/.local/bin/tangleOrgModeConfigs.sh :shebang #!/bin/bash
 
-  orgPath=${1}
+    orgPath=${1}
 
-  if [[ ! -d ${orgPath} ]]; then
-      echo "$0 pathToOrgConfigDir" >&2
-      echo "${orgPath} Does not exist." >&2
-      exit 1
-  fi
+    if [[ ! -d ${orgPath} ]]; then
+        echo "$0 pathToOrgConfigDir" >&2
+        echo "${orgPath} Does not exist." >&2
+        exit 1
+    fi
 
-  find ${orgPath} -type f -name '*.org' \
-      | xargs emacs --quick --batch --eval "(progn (require 'ob-tangle) (dolist (file command-line-args-left) (with-current-buffer (find-file-noselect file) (org-babel-tangle) (org-babel-execute-buffer))))"
+
+    find ${orgPath} -type f -name '*.org' \
+        | xargs emacs --quick --batch --script <(cat <<EOF
+       (org-babel-do-load-languages
+         'org-babel-load-languages
+         '((shell . t)))
+       (setq org-confirm-babel-evaluate nil)
+       (progn
+              (require 'ob-tangle)
+              (dolist
+                (file command-line-args-left)
+                    (message "Processing config: %s" file)
+                (with-current-buffer
+                    (find-file-noselect file)
+                    (org-babel-tangle)
+                    (org-babel-execute-buffer))))
+  EOF
+  )
 
 #+end_src
 
