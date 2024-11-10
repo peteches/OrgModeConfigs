@@ -72,7 +72,7 @@ set completion-selected-css=color:#d3d0c8;background-color:#515151;font:12pt Dej
 #+end_src
 ** cursiv-font (string)
 The font family used as the default for content using cursive font.
-#+begin_src conf :tangle no ## disabled
+#+begin_src conf :tangle no
 set cursive-font=""
 #+end_src
 ** dark-mode (bool)
@@ -304,7 +304,7 @@ set print-backgrounds=false
 #+end_src
 ** private-browsing (bool)
 Whether to enable private browsing mode. This suppresses printing of messages into JavaScript Console. At the time this is the only way to force WebKit to not allow a page to store data in the windows sessionStorage.
-#+begin_src conf :tangle no ## disabled
+#+begin_src conf :tangle no
 set private-browsing=false
 #+end_src
 ** plugins (bool)
@@ -359,7 +359,7 @@ set smooth-scrolling=true
 #+end_src
 ** spacial-navigation (bool)
 Whether to enable the Spatial Navigation. This feature consists in the ability to navigate between focusable elements in a Web page, such as hyperlinks and form controls, by using Left, Right, Up and Down arrow keys. For example, if a user presses the Right key, heuristics determine whether there is an element they might be trying to reach towards the right, and if there are multiple elements, which element they probably want.
-#+begin_src conf :tangle no ## disabled
+#+begin_src conf :tangle no
 set spacial-navigation=true
 #+end_src
 ** spell-checking (bool)
@@ -550,7 +550,7 @@ Set the shortcut for given shortcut as the default, that is the shortcut to be u
 #+end_src
 * Themes
 ** Main style
-#+begin_src css :tangle no # ~/.config/vimb/style.css
+#+begin_src css :tangle no
   @media (prefers-color-scheme: dark) {
   html,body,li,pre,div,textarea,body,input,td,tr,nav,article,header,p {
       color: #ccc !important;
