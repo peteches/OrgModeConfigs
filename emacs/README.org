@@ -1018,45 +1018,29 @@ This snippet adds a hook to =org-mode= buffers so that =efs/org-babel-tangle-con
 #+end_src
 
 ** Project navigations
-*** Setup helper function for project discovery
+
+f*** Use projectile to help navigate projects
 #+begin_src emacs-lisp
+      (use-package projectile
+        :diminish projectile-mode
+        :config
+        (projectile-mode)
+        (projectile-register-project-type 'golang '("go.mod" "go.sum")
+                                          :project-file "go.mod"
+                                          :compile "go build"
+                                          :test "go test ./..."
+                                          :run "go run"
+                                          :test-suffix "_test.go")
+        (add-to-list 'projectile-project-root-files "go.mod")
+        (setq projectile-project-search-path '(("~/area_51/" . 10)))
+        (setq projectile-indexing-method 'alien)
+        (setq projectile-generic-command '"fd --print0 --type file")
 
-  (defun peteches/find-go-projects (dir)
-    (split-string (shell-command-to-string
-		   (format "fd --print0 --type file go.mod %s --exec dirname" dir)
-		   )
-    ))
+        :custom
+        (projectile-completion-system 'ivy)
 
-#+end_src
-
-*** Use projectile to help navigate projects
-#+begin_src emacs-lisp
-  (use-package projectile
-    :diminish projectile-mode
-    :config
-    (projectile-mode)
-    (projectile-register-project-type 'golang '("go.mod" "go.sum")
-                                      :project-file "go.mod"
-                                      :compile "go build"
-                                      :test "go test ./..."
-                                      :run "go run"
-                                      :test-suffix "_test.go")
-    (add-to-list 'projectile-project-root-files "go.mod")
-    (setq projectile-project-search-path (peteches/find-go-projects "~/area_51/"))
-    (setq projectile-indexing-method 'alien)
-    (setq projectile-generic-command '"fd --print0 --type file")
-
-    :custom
-    (projectile-completion-system 'ivy)
-    (projectile-project-root-functions
-     '(projectile-root-local
-       projectile-root-marked
-       projectile-root-top-down
-       projectile-root-top-down-recurring
-       projectile-root-bottom-up
-       ))
-    :bind-keymap
-    ("C-c p" . projectile-command-map))
+        :bind-keymap
+        ("C-c p" . projectile-command-map))
 
 #+end_src
 

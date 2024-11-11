@@ -21,7 +21,7 @@ This snippet uses [[https://www.gnu.org/software/emacs/manual/html_node/org/Nowe
 #+end_src
 
 Then our =gitignore= becomes several calls to that function
-#+begin_src conf :noweb yes :tangle ~/.config/git/global_ignore
+#+begin_src conf :noweb yes :tangle ~/.config/git/ignore
   <<getIgnores(ignoreFile="Global/Emacs.gitignore")>>
   <<getIgnores(ignoreFile="Global/Backup.gitignore")>>
   <<getIgnores(ignoreFile="Global/Ansible.gitignore")>>
