@@ -195,6 +195,15 @@ This rule ensures that windows never start maximised. This is a static event, so
 #+begin_src conf
   windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
 #+end_src
+** Workspaces
+*** Communications
+This workspace is for email / irc etc
+#+begin_src conf
+  workspace = name:comms, persistent:true
+  bind = $mainMod, c, workspace, name:comms
+  windowrulev2 = workspace name:comms, title:slack
+  windowrulev2 = workspace name:comms, title:discord
+#+end_src
 ** Key Bindings
 [[https://wiki.hyprland.org/Configuring/Binds/][Key Binds]] allow full keyboard control of the hyprland environment.
 *** Application startups
