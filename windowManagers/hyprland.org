@@ -201,8 +201,8 @@ This workspace is for email / irc etc
 #+begin_src conf
   workspace = name:comms, persistent:true
   bind = $mainMod, c, workspace, name:comms
-  windowrulev2 = workspace name:comms, title:slack
-  windowrulev2 = workspace name:comms, title:discord
+  windowrulev2 = workspace name:comms, title:Slack
+  windowrulev2 = workspace name:comms, title:Discord
 #+end_src
 ** Key Bindings
 [[https://wiki.hyprland.org/Configuring/Binds/][Key Binds]] allow full keyboard control of the hyprland environment.
