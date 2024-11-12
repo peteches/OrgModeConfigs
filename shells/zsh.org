@@ -22,7 +22,7 @@ We want to keep all config as much as possible in =XDG= places so keep a minimal
 #+end_src
 *** Source global profile
 A lot of systems have important startup code in =/etc/profile= so lets source that.
-#+begin_src bash :tangle ~/.j
+#+begin_src bash
 source /etc/profile
 #+end_src
 
@@ -335,6 +335,14 @@ These are for =.zlogin= meaning they can't be overridden by =.zshrc= for interac
   stty stop ""
 #+end_src
 
+** Locals
+Some machines will need local configs not meant to be in version control
+#+begin_src bash
+  [[ -d ~/.config/zsh/locals.d ]] || mkdir ~/.config/zsh/locals.d
+  for localDir in ~/.config/zsh/locals.d; do
+      source ${localDir}
+  done
+#+end_src
 * .zlogin
 :PROPERTIES:
 :header-args: :tangle ~/.config/zsh/.zlogin
