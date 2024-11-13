@@ -122,6 +122,5 @@ Define a shell script to tangle and execute all org files
 Now to enable the timer
 #+begin_src bash :tangle no :eval yes
   systemctl --user daemon-reload
-  systemctl --user start TangleOrgModeConfigs.service
   systemctl --user start TangleOrgModeConfigs.timer
 #+end_src
