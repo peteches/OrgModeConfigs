@@ -702,14 +702,14 @@ I want to retrieve the name of a struct field from the line the cursor is curren
 #+end_src
 
 ******* If Err
-#+begin_src conf
+#+begin_src conf :tangle ~/.config/emacs/snippets/go-ts-mode/ife
   # -*- mode: snippet -*-
-    # name: If Err
-    # key: ife
-    # --
-    if ${1:err} != nil {
+  # name: If Err
+  # key: ife
+  # --
+  if ${1:err} != nil {
     ${2:$$(concat "return " (go-ts-get-initialised-return-types))}
-    }
+  }
 #+end_src
 
 ******* Return statement
