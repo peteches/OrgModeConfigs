@@ -948,7 +948,7 @@ Add ox-extra
     (add-to-list 'org-structure-template-alist '("mmd" . "src mermaid :file ./mermaid.png")))
 #+end_src
 ****** CSS
-#+begin_src emacs-lisp :eval yes
+#+begin_src emacs-lisp
   (add-to-list 'org-structure-template-alist '("css" . "src css"))
 #+end_src
 *****  load languages
