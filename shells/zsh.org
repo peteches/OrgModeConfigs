@@ -434,7 +434,7 @@ command dig $@ && printf "\nYes you can!\n" || printf "No sorry you arn't cool e
 
 ** Gclone
 :PROPERTIES:
-:header-args: :shebang #!/usr/bin/env bash :tangle ~/.local/bin/gclone :mkdirp yes
+:header-args: :shebang #!/usr/bin/env bash :tangle ~/.local/bin/gclone :mkdirp yes :eval no
 :END:
 Gclone is a bash script to wrap `git clone` it ensures all my git repositories are cloned consistently.
 
