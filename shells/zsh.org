@@ -9,7 +9,7 @@ Zsh reads different [[https://zsh.sourceforge.io/Doc/Release/Files.html#Files-1]
 =ZDOTDIR= is the directory to search for shell startup files (.zshrc, etc), if not $HOME.
 * .zshenv
 :PROPERTIES:
-:header-args: :mkdirp yes :tangle ~/.config/zsh/.zshenv
+:header-args: :mkdirp yes :tangle ~/.config/zsh/.zshenv  :eval no
 :END:
 
 =/etc/zshenv= is always the first file to be sourced, this cannot be changed and so should be minimal. After the global =/etc/zshenv= is read next is =${ZDOTDIR}/.zshenv=
