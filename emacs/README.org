@@ -153,9 +153,7 @@ Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see
 #+begin_src emacs-lisp
   (use-package yasnippet
     :ensure t
-    :bind (:map yas-minor-mode-map
-                 ("C-RET" . yas-expand)
-                 )
+    :bind ("C-c s" . yas-insert-snippet)
     :custom
     (yas-verbosity 2)
     (yas-wrap-around-region t)
@@ -169,8 +167,7 @@ Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see
                                    '(
                                      "~/.config/emacs/snippets"  ;; personal snippets
                                      ))
-          yas-triggers-in-field t
-     )
+          yas-triggers-in-field t)
     (yas-reload-all)
     (yas-global-mode)
     :hook (company-mode . (lambda ()
@@ -607,45 +604,57 @@ I want to retrieve the name of a struct field from the line the cursor is curren
 *******  Initialise a go type into concrete Zero value
 #+begin_src emacs-lisp
   ;; liberated from https://blog.meain.io/2021/intelligent-snippets-treesitter/
-  (defun go-ts-initialise-zero-value (type)
-    "Return an initialised zero value of type TYPE."
+  (defun go-ts-initialise-zero-value (type &optional place-num expandError)
+    "Return an initialised zero value of type TYPE. if expandError non-nil initialised error will use fmt.Errorf"
+    (or place-num (setq place-num 1))
     (if (treesit-node-p type)
         (setq type (treesit-node-text type)))
     (message "testing: %s" type)
     (pcase type
-      ("error" (go-ts-initialise-error))
-      ("string" "\"\"")
-      ("rune" "0")
-      ("bool" "false")
-      ("chan" "nil")
-      ((pred (string-match-p "^int\\(8\\|16\\|32\\|64\\)?$")) "0") ; any integer type
-      ((pred (string-match-p "^float\\(32\\|64\\)$")) "0.0") ; any float type
-      ((pred (string-prefix-p "<-")) "nil") ; channels
-      ((pred (string-prefix-p "[")) "nil") ; arrays
-      ((pred (string-prefix-p "*")) "nil") ; pointers to things
+      ("error" (go-ts-initialise-error place-num expandError))
+      ("string" (format "\"${%d:str}\"" place-num))
+      ("rune" (format "${%d:0}" place-num))
+      ("bool" (format "${%d:false}" place-num))
+      ("chan" (format "${%d:nil}" place-num))
+      ((pred (string-match-p "^int\\(8\\|16\\|32\\|64\\)?$")) (format "${%d:0}" place-num) ; any integer type
+      ((pred (string-match-p "^float\\(32\\|64\\)$")) (format "${%d:0.0}" place-num)) ; any float type
+      ((pred (string-prefix-p "<-")) (format "${%d:nil}" place-num)) ; channels
+      ((pred (string-prefix-p "[")) (format "${%d:nil}" place-num)) ; arrays
+      ((pred (string-prefix-p "*")) (format "${%d:nil}" place-num)) ; pointers to things
       ((pred (string-match " ")) nil) ; for situations with return name
-      (_ (concat type "{}"))))
+      (_ (format "${%d:%s{}}" place-num type)))))
 #+end_src
 ******* Initialise an err
 #+begin_src emacs-lisp
-  (defun go-ts-initialise-error (&optional p)
-    "Uses Treesitter to dermine best value of error in position P. If P not set use point."
+  (defun go-ts-initialise-error (&optional place-num expandError)
+    "Uses Treesitter to dermine best value of error. place-num is the yas-snippet placeholder If expandError is non-nil fmt.Errorf() is produced"
+    (or place-num (setq place-num 1))
     (or p (setq p (point)))
     (let ((parent-node (treesit-parent-until (treesit-node-at p)
                                              (lambda(n)
                                                (string-match-p "if_statement" (treesit-node-type n))))))
-      (message "initialising error: %s" (treesit-node-text parent-node))
-      (if parent-node
-          (format "fmt.Errorf(\"${1:error detected}: %%w\", %s)" (treesit-node-text (treesit-node-child-by-field-name (treesit-node-child-by-field-name parent-node "condition") "left")))
+    (message "initialising error: %s" (treesit-node-text parent-node))
+    (if (or parent-node expandError)
+          (format "fmt.Errorf(\"${%d:error detected}: %%w\", ${%d:%s})"
+                  place-num
+                  (+ place-num)
+                  (treesit-node-text (treesit-node-child-by-field-name (treesit-node-child-by-field-name parent-node "condition") "left")))
         "nil")))
 #+end_src
 
 ******* Get function return types
 #+begin_src emacs-lisp
-  (defun go-ts-get-initialised-return-types (&optional p)
-    "Uses Treesitter to turn a functions return values into a snippet with default values. If P not set use point."
+  (defun go-ts-get-initialised-return-types (place-num &optional p expandError)
+    "Use Treesitter to turn a functions return values into a snippet with default values.
+  PLACE-NUM is the placeholder number to start with.
+  If P not set use point.  If EXPANDERROR non-nil fmt.Errorf() will be used."
     (or p (setq p (point)))
-    (string-join (remove nil (mapcar 'go-ts-initialise-zero-value (treesit-query-capture (go-ts-get-func-node p) go-ts-query-get-func-return-types nil nil t))) ", "))
+    (string-join (remove nil
+                         (mapcar (lambda (type)
+                                   (funcall 'go-ts-initialise-zero-value type place-num expandError))
+                                 (treesit-query-capture (go-ts-get-func-node p)
+                                                        go-ts-query-get-func-return-types nil nil t)))
+                 ", "))
 #+end_src
 
 ****** Compiled queries
@@ -706,10 +715,16 @@ I want to retrieve the name of a struct field from the line the cursor is curren
   # -*- mode: snippet -*-
   # name: If Err
   # key: ife
+  # type: command
   # --
-  if ${1:err} != nil {
-    ${2:$$(concat "return " (go-ts-get-initialised-return-types))}
-  }
+  (let ((yas-good-grace nil))
+    (yas-expand-snippet
+      (concat "if ${1:err} != nil {\n"
+              "\t$0\n"
+              "\t${2:return "
+              (go-ts-get-initialised-return-types 3 nil t)
+              "}\n"
+              "}\n")))
 #+end_src
 
 ******* Return statement
@@ -719,7 +734,7 @@ I want to retrieve the name of a struct field from the line the cursor is curren
   # key: ret
   # type: command
   # --
-  (yas-expand-snippet (concat "return " (go-ts-get-initialised-return-types)))
+  (yas-expand-snippet (concat "return " (go-ts-get-initialised-return-types 1 nil nil)))
 #+end_src
 
 ******* Struct Field
