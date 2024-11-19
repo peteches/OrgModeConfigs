@@ -1069,8 +1069,12 @@ f*** Use projectile to help navigate projects
 ** Magit Awesome Git porcelain
 Magit https://magit.vc is a nice git porcelain inside emacs
 *** Install Packages
-#+begin_src emacs-lisp
-  (use-package magit)
+#+begin_src emacs-lisp :eval yes
+       (use-package magit)
+       (use-package forge
+         :after magit
+         :custom
+         (auth-sources `("~/.authinfo.gpg")))
 #+end_src
 *** GPG signing commits requires emacs act as pinentry
 #+begin_src emacs-lisp :tangle no
