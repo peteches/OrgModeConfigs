@@ -54,6 +54,19 @@ Set some =User= parameters
           email = pete@peteches.co.uk
           signingkey = A6E8150FED0029D7!
 #+end_src
+** Forge
+Emacs' forge package wants to know github and gitlab username
+#+begin_src conf :tangle ~/.config/git/config
+  [github]
+        user = peteches
+  [gitlab]
+        user = peteches
+#+end_src
+** Github use ssh where possible
+#+begin_src conf :tangle ~/.config/git/config
+  [url "git@github.com:"]
+     insteadOf = https://github.com
+#+end_src
 ** Commit
 #+begin_src conf :tangle ~/.config/git/config
   [commit]
