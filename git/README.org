@@ -10,6 +10,9 @@ To install pre-commit o Gentoo:
 #+end_src
 
 * Global Ignores
+:PROPERTIES:
+:header-args: :tangle ~/.config/git/ignore
+:END:
 [[https://github.com/github/gitignore][GitHub Gitignore]] repo has many great gitignore files for all sorts of stuff, so I'm +stealing+ making use of the good effort they have already put in.
 This snippet uses [[https://www.gnu.org/software/emacs/manual/html_node/org/Noweb-Reference-Syntax.html][NoWeb]] to write a babel function that gets the specified gitignore from [[https://github.com/github/gitignore]]
 #+name: getIgnores
@@ -21,7 +24,7 @@ This snippet uses [[https://www.gnu.org/software/emacs/manual/html_node/org/Nowe
 #+end_src
 
 Then our =gitignore= becomes several calls to that function
-#+begin_src conf :noweb yes :tangle ~/.config/git/ignore
+#+begin_src conf :noweb yes
   <<getIgnores(ignoreFile="Global/Emacs.gitignore")>>
   <<getIgnores(ignoreFile="Global/Backup.gitignore")>>
   <<getIgnores(ignoreFile="Global/Ansible.gitignore")>>
@@ -45,17 +48,20 @@ Then our =gitignore= becomes several calls to that function
 #+end_src
 
 * Global Config
+:PROPERTIES:
+:header-args: :tangle ~/.config/git/config
+:END:
 There are a lot of [[https://www.git-scm.com/docs/git-config][Git Config]] options.
 ** User
 Set some =User= parameters
-#+begin_src conf :tangle ~/.config/git/config
+#+begin_src conf
   [user]
           name = Pete 'Peteches' McCabe
           email = pete@peteches.co.uk
           signingkey = A6E8150FED0029D7!
 #+end_src
 ** Commit
-#+begin_src conf :tangle ~/.config/git/config
+#+begin_src conf
   [commit]
           gpgSign = true
 
@@ -63,16 +69,16 @@ Set some =User= parameters
 
 ** Core
 These configure the core aspects of Git.
-#+begin_src conf :tangle ~/.config/git/config
+#+begin_src conf
   [core]
           pager = cat # disable paging
-          editor = /usr/local/bin/emacsclient
+          editor = /usr/local/bin/emacsclient --create-frame
           hooksPath = ~/.config/git/hooks.d
 #+end_src
 
 ** Diff
 
-#+begin_src conf :tangle ~/.config/git/config
+#+begin_src conf
   [diff]
           context = 5
           algorithm = minimal
@@ -81,14 +87,14 @@ These configure the core aspects of Git.
 #+end_src
 
 ** Pull
-#+begin_src conf :tangle ~/.config/git/config
+#+begin_src conf
   [pull]
           ff = true
           rebase = true
 #+end_src
 
 ** Push
-#+begin_src conf :tangle ~/.config/git/config
+#+begin_src conf
   [push]
           autoSetupRemote = true
           default = nothing
@@ -97,13 +103,24 @@ These configure the core aspects of Git.
 #+end_src
 
 ** ReReRe
-#+begin_src conf :tangle ~/.config/git/config
+#+begin_src conf
   [rerere]
           autoUpdate = true
           enabled = true
 
 #+end_src
 
+** Prefer SSH
+*** github
+#+begin_src conf
+ [url "git@github.com:"]
+     insteadOf =  https://github.com/
+#+end_src
+*** gitlab
+#+begin_src conf
+  [url "git@gitlab.com:"]
+       insteadOf = https://gitlab.com/
+#+end_src
 * Hooks
 
 ** Pre commit
