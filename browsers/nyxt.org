@@ -9,7 +9,7 @@
 :header-args: :mkdirp yes :eval no :tangle ~/.config/nyxt/config.lisp
 :END:
 
-#+begin_src bash :eval yes :export all :tangle no
+#+begin_src bash :eval no :export all :tangle no
 
   nyxt --no-socket --headless --quit --config ~/.config/nyxt/config.lisp
 
