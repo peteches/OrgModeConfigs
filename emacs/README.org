@@ -437,16 +437,17 @@ Not sure why just yet but this hook seems to stop evil-mode working everywhere.
 ****** Add breadcrumbs to LSP buffers:
 This sets up a trace of where the point is withing the project.
 #+begin_src emacs-lisp
-(defun peteches/lsp-mode-breadcrumbs ()
-  (setq lsp-hqeaderline-breadcrumb-segments '(path-up-to-project file symbols))
-  (lsp-headerline-breadcrumb-mode))
+  (defun peteches/lsp-mode-breadcrumbs ()
+    (setq lsp-hqeaderline-breadcrumb-segments '(path-up-to-project file symbols))
+    (lsp-headerline-breadcrumb-mode))
 #+end_src
 
 ***** Then wrap them up in a single wrapper hook function
 #+begin_src emacs-lisp
   (defun peteches/lsp-mode-settings ()
     (peteches/lsp-mode-breadcrumbs)
-  )
+    (add-hook 'before-save-hook #'lsp-format-buffer t t)
+    (add-hook 'before-save-hook #'lsp-organize-imports t t))
 #+end_src
 
 ***** Install LSP
@@ -457,10 +458,10 @@ This sets up a trace of where the point is withing the project.
         (setq lsp-keymap-prefix "C-c l")
       :config
         (lsp-enable-which-key-integration t)
-      :hook
+        :hook
         (
-          (go-mode . lsp)
-          (go-ts-mode . lsp) ;; for treesitter go mode
+          (go-mode . lsp-mode)
+          (go-ts-mode . lsp-mode) ;; for treesitter go mode
           (lsp-mode . peteches/lsp-mode-settings)
         )
     )
