@@ -110,16 +110,28 @@ These configure the core aspects of Git.
 
 #+end_src
 
-** Prefer SSH
+** Per Remote configs
 *** github
+**** Prefer SSH connections
 #+begin_src conf
  [url "git@github.com:"]
      insteadOf =  https://github.com/
 #+end_src
+**** Add github user for [[https://magit.vc/manual/forge.html#Setup-for-Githubcom][forge]]
+#+begin_src conf
+ [github]
+     user = peteches
+#+end_src
 *** gitlab
+**** Prefer SSH connections
 #+begin_src conf
   [url "git@gitlab.com:"]
        insteadOf = https://gitlab.com/
+#+end_src
+**** Add gitlab user for [[https:magit.vc/manual/forge.html#Setup-for-Gitlabcom][forge]]
+#+begin_src conf
+  [gitlab]
+	user = peteches
 #+end_src
 * Hooks
 
