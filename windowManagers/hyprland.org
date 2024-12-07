@@ -217,7 +217,11 @@ This workspace is for email / irc etc
 ***** FireFox Profiles
 #+begin_src bash :tangle ~/.local/bin/firefoxProfile.sh :shebang #!/usr/bin/env bash
 
-  profile=$(cat ${HOME}/.mozilla/firefox/profiles.ini | awk --field-separator '=' '/^Name/ {print $2}' | wofi -d -p "Choose Firefox profile to launch")
+  profile=$(cat ${HOME}/.mozilla/firefox/profiles.ini \
+                | awk --field-separator '=' '/^Name/ {print $2}' \
+                | wofi --dmenu \
+                       --insensitive \
+                       --prompt "Choose Firefox profile to launch")
 
   nohup firefox-bin -P "${profile}" & >/dev/null 2>&1
 #+end_src
@@ -229,21 +233,30 @@ This workspace is for email / irc etc
 #+begin_src bash :shebang #!/usr/bin/env bash :tangle ~/.local/bin/passwordWofi.sh
 
 
-     password=$( find ${HOME}/.password-store -type f -name '*.gpg' -printf '%P\n' |  sed 's/.gpg//' | wofi -d -p "Select Password:")
+  password=$( find ${HOME}/.password-store -type f -name '*.gpg' -printf '%P\n' \
+                  |  sed 's/.gpg//' \
+                  | wofi --dmenu \
+                         --insensitive \
+                         --prompt "Select Password:")
 
-     fields=$( echo Password; pass show "${password}" | awk -F: 'NR>1{print $1}' )
+  fields=$( echo Password; pass show "${password}" | awk -F: 'NR>1{print $1}' )
 
-     field=$( echo -e "${fields}" | sed '/^\s*$/d'  | wofi -d -p "Choose entry:" )
+  field=$( echo -e "${fields}" \
+               | sed '/^\s*$/d'  \
+               | wofi \
+                     --dmenu \
+                     --insensitive \
+                     --prompt "Choose entry:" )
 
-     case ${field} in
-         Password)
-             pass --clip "${password}"
-             ;;
-         ,*)
-          source <(sed -n '0,/END platform definable/p' $(which pass)) # gives access to the clip() function to copy data securely
-          clip $(pass show "${password}" | sed -n "/^${field}/s/^${field}\s*:\s*//p" ) "${password}"
+  case ${field} in
+      Password)
+          pass --clip "${password}"
           ;;
-     esac
+      ,*)
+       source <(sed -n '0,/END platform definable/p' $(which pass)) # gives access to the clip() function to copy data securely
+       clip $(pass show "${password}" | sed -n "/^${field}/s/^${field}\s*:\s*//p" ) "${password}"
+       ;;
+  esac
 #+end_src
 
 #+begin_src conf
@@ -251,67 +264,70 @@ This workspace is for email / irc etc
 #+end_src
 ***** Screen shot / screen recording
 #+begin_src bash :shebang #!/usr/bin/env bash :tangle ~/.local/bin/screenshot.sh
-  export HYPRSHOT_DIR=${HOME}/Pictures/ScreenShots/
-  [[ -d ${HYPRSHOT_DIR} ]] || mkdir -p ${HYPRSHOT_DIR}
+        export HYPRSHOT_DIR=${HOME}/Pictures/ScreenShots/
+        [[ -d ${HYPRSHOT_DIR} ]] || mkdir -p ${HYPRSHOT_DIR}
 
-  ssWindow="ScreenShot Window"
-  ssRegion="ScreenShot Region"
-  srRegion="ScreenRecord Region"
-  srRegionNoAudio="ScreenRecord Region -- no audio"
-  srMonitor="ScreenRecord Monitor"
-  srMonitorNoAudio="ScreenRecord Monitor -- no audio"
-  stopSr="Stop ScreenRecording"
-  choices=(
-      "${ssWindow}"
-      "${ssRegion}"
-      "${srRegion}"
-      "${srRegionNoAudio}"
-      "${srMonitor}"
-      "${srMonitorNoAudio}"
-      "${stopSr}"
-  )
-  choice=$( printf "%s\n" "${choices[@]}" | wofi -d -p "Select screen record option:")
+        ssWindow="ScreenShot Window"
+        ssRegion="ScreenShot Region"
+        srRegion="ScreenRecord Region"
+        srRegionNoAudio="ScreenRecord Region -- no audio"
+        srMonitor="ScreenRecord Monitor"
+        srMonitorNoAudio="ScreenRecord Monitor -- no audio"
+        stopSr="Stop ScreenRecording"
+        choices=(
+            "${ssWindow}"
+            "${ssRegion}"
+            "${srRegion}"
+            "${srRegionNoAudio}"
+            "${srMonitor}"
+            "${srMonitorNoAudio}"
+            "${stopSr}"
+        )
+        choice=$( printf "%s\n" "${choices[@]}" | wofi \
+                                                      --dmenu \
+                                                      --insensitive \
+                                                      --prompt "Select screen record option:")
 
-  case ${choice} in
-      ${ssWindow})
-          hyprshot --mode window
-          ;;
-      ${ssRegion})
-          hyprshot --mode region
-          ;;
+        case ${choice} in
+            ${ssWindow})
+                hyprshot --mode window
+                ;;
+            ${ssRegion})
+                hyprshot --mode region
+                ;;
 
-      ${srRegionNoAudio})
-          nohup > /dev/null 2>&1 wf-recorder \
-                --geometry "$(slurp)" \
-                -f ${HYPRSHOT_DIR}/$(date +"%Y-%m-%d%H%M%S_wf-recorder.mp4") &
-          ;;
-      ${srRegion})
-          nohup > /dev/null 2>&1 wf-recorder \
-                --geometry "$(slurp)" \
-                --audio \
-                -f ${HYPRSHOT_DIR}/$(date +"%Y-%m-%d%H%M%S_wf-recorder.mp4") &
-          ;;
-      ${srMonitorNoAudio})
-          nohup > /dev/null 2>&1 wf-recorder \
-                --geometry "$(slurp -o)" \
-                -f ${HYPRSHOT_DIR}/$(date +"%Y-%m-%d%H%M%S_wf-recorder.mp4") &
-          ;;
-      ${srMonitor})
-          nohup > /dev/null 2>&1 wf-recorder \
-                --geometry "$(slurp -o)" \
-                --audio \
-                -f ${HYPRSHOT_DIR}/$(date +"%Y-%m-%d%H%M%S_wf-recorder.mp4") &
-          ;;
+            ${srRegionNoAudio})
+                nohup > /dev/null 2>&1 wf-recorder \
+                      --geometry "$(slurp)" \
+                      -f ${HYPRSHOT_DIR}/$(date +"%Y-%m-%d%H%M%S_wf-recorder.mp4") &
+                ;;
+            ${srRegion})
+                nohup > /dev/null 2>&1 wf-recorder \
+                      --geometry "$(slurp)" \
+                      --audio \
+                      -f ${HYPRSHOT_DIR}/$(date +"%Y-%m-%d%H%M%S_wf-recorder.mp4") &
+                ;;
+            ${srMonitorNoAudio})
+                nohup > /dev/null 2>&1 wf-recorder \
+                      --geometry "$(slurp -o)" \
+                      -f ${HYPRSHOT_DIR}/$(date +"%Y-%m-%d%H%M%S_wf-recorder.mp4") &
+                ;;
+            ${srMonitor})
+                nohup > /dev/null 2>&1 wf-recorder \
+                      --geometry "$(slurp -o)" \
+                      --audio \
+                      -f ${HYPRSHOT_DIR}/$(date +"%Y-%m-%d%H%M%S_wf-recorder.mp4") &
+                ;;
 
-      ${stopSr})
-          if pgrep -x "wf-recorder" > /dev/null; then
-              pkill -INT -x wf-recorder
-              notify-send "Stopping wf-recorder"
-              exit 0
-          fi
-          ;;
+            ${stopSr})
+                if pgrep -x "wf-recorder" > /dev/null; then
+                    pkill -INT -x wf-recorder
+                    notify-send "Stopping wf-recorder"
+                    exit 0
+                fi
+                ;;
 
-    esac
+          esac
 #+end_src
 
 #+begin_src conf
