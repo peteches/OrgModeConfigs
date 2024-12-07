@@ -293,10 +293,12 @@ This workspace is for email / irc etc
           ;;
       ${srMonitorNoAudio})
           nohup > /dev/null 2>&1 wf-recorder \
+                --geometry "$(slurp -o)" \
                 -f ${HYPRSHOT_DIR}/$(date +"%Y-%m-%d%H%M%S_wf-recorder.mp4") &
           ;;
       ${srMonitor})
           nohup > /dev/null 2>&1 wf-recorder \
+                --geometry "$(slurp -o)" \
                 --audio \
                 -f ${HYPRSHOT_DIR}/$(date +"%Y-%m-%d%H%M%S_wf-recorder.mp4") &
           ;;
