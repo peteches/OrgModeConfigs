@@ -249,6 +249,72 @@ This workspace is for email / irc etc
 #+begin_src conf
       bind = $mainMod, p, exec, ${HOME}/.local/bin/passwordWofi.sh
 #+end_src
+***** Screen shot / screen recording
+#+begin_src bash :shebang #!/usr/bin/env bash :tangle ~/.local/bin/screenshot.sh
+  export HYPRSHOT_DIR=${HOME}/Pictures/ScreenShots/
+  [[ -d ${HYPRSHOT_DIR} ]] || mkdir -p ${HYPRSHOT_DIR}
+
+  ssWindow="ScreenShot Window"
+  ssRegion="ScreenShot Region"
+  srRegion="ScreenRecord Region"
+  srRegionNoAudio="ScreenRecord Region -- no audio"
+  srMonitor="ScreenRecord Monitor"
+  srMonitorNoAudio="ScreenRecord Monitor -- no audio"
+  stopSr="Stop ScreenRecording"
+  choices=(
+      "${ssWindow}"
+      "${ssRegion}"
+      "${srRegion}"
+      "${srRegionNoAudio}"
+      "${srMonitor}"
+      "${srMonitorNoAudio}"
+      "${stopSr}"
+  )
+  choice=$( printf "%s\n" "${choices[@]}" | wofi -d -p "Select screen record option:")
+
+  case ${choice} in
+      ${ssWindow})
+          hyprshot --mode window
+          ;;
+      ${ssRegion})
+          hyprshot --mode region
+          ;;
+
+      ${srRegionNoAudio})
+          nohup > /dev/null 2>&1 wf-recorder \
+                --geometry "$(slurp)" \
+                -f ${HYPRSHOT_DIR}/$(date +"%Y-%m-%d%H%M%S_wf-recorder.mp4") &
+          ;;
+      ${srRegion})
+          nohup > /dev/null 2>&1 wf-recorder \
+                --geometry "$(slurp)" \
+                --audio \
+                -f ${HYPRSHOT_DIR}/$(date +"%Y-%m-%d%H%M%S_wf-recorder.mp4") &
+          ;;
+      ${srMonitorNoAudio})
+          nohup > /dev/null 2>&1 wf-recorder \
+                -f ${HYPRSHOT_DIR}/$(date +"%Y-%m-%d%H%M%S_wf-recorder.mp4") &
+          ;;
+      ${srMonitor})
+          nohup > /dev/null 2>&1 wf-recorder \
+                --audio \
+                -f ${HYPRSHOT_DIR}/$(date +"%Y-%m-%d%H%M%S_wf-recorder.mp4") &
+          ;;
+
+      ${stopSr})
+          if pgrep -x "wf-recorder" > /dev/null; then
+              pkill -INT -x wf-recorder
+              notify-send "Stopping wf-recorder"
+              exit 0
+          fi
+          ;;
+
+    esac
+#+end_src
+
+#+begin_src conf
+  bind = $mainMod, PRINT, exec, ${HOME}/.local/bin/screenshot.sh
+#+end_src
 *** Window management
 #+begin_src conf
   bind = $mainMod      , q, killactive
