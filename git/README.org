@@ -137,7 +137,7 @@ These configure the core aspects of Git.
 
 ** Pre commit
 I like to use [[https://pre-commit.com/][pre-commit]] to manage all my git hooks, So I will add it as a global pre-commit hook.
-#+begin_src bash :tangle ~/.config/git/hooks.d/pre-commit :shebang #!/usr/bin/env bash
+#+begin_src bash :tangle ~/.config/git/hooks.d/pre-commit :shebang #!/usr/bin/env bash :eval no
 
 # start templated
 INSTALL_PYTHON=/usr/bin/python3
