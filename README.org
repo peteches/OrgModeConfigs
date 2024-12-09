@@ -29,7 +29,9 @@ Define a shell script to tangle and execute all org files
                     (message "Processing config: %s" file)
                 (with-current-buffer
                     (find-file-noselect file)
+                    (message "Tangling config: %s\n\n" file)
                     (org-babel-tangle)
+                    (message "Executing config: %s\n\n" file)
                     (org-babel-execute-buffer))))
   EOF
   )
