@@ -1,0 +1,36 @@
+#+title: Pete's ssh agent config
+
+* Start Agent via Systemd
+:PROPERTIES:
+:header-args: :eval no :mkdirp yes
+:END:
+
+** Agent Socket variable
+ssh agent uses the =ssh_auth_sock= variable, as this needs to be shared with other processes that want to use it lets export it via
+[[https://www.freedesktop.org/software/systemd/man/latest/environment.d.html][SystemD environment]]
+#+begin_src conf :tangle ~/.config/environment.d/99-ssh-agent.conf
+          SSH_AUTH_SOCK=/run/user/${UID}/ssh-agent.sock
+#+end_src
+
+** Start agent at user login
+User a Systemd Service file to start ssh-agent at login and also find all private keys in the =~/.ssh= directory and add them to the agent
+#+begin_src conf :tangle ~/.config/systemd/user/ssh-agent.service
+  [Unit]
+  Description=SSH Agent
+  Documentation=man:ssh-agent
+
+  [Service]
+  Type=simple
+  ExecStart=ssh-agent -a ${SSH_AUTH_SOCK}
+  ExecStartPost=-find ~/.ssh -type f -exec file '{}' \+ | grep 'private key' | cut -d: -f1 | xargs ssh-add
+
+  [Install]
+  WantedBy=default.target
+#+end_src
+
+Then we need to enable that service.
+#+begin_src bash :tangle no :eval yes
+  if [[ "$(systemctl is-enabled ssh-agent.service)" == "disabled" ]]; then
+      systemctl enable --now ssh-agent.service
+  fi
+#+end_src
