@@ -1,0 +1,24 @@
+#+title: Petes SSH Client Config
+
+
+* I like ssh config so lets setup my local connections
+:PROPERTIES:
+:header-args: :eval no :mkdirp yes :tangle ~/.config/ssh/config
+:END:
+
+** Redirect to XDG config dir
+#+begin_src conf :tangle ~/.ssh/config
+  Include ~/.config/ssh/config
+#+end_src
+** Defaults
+#+begin_src conf
+  Host *
+     CanonicalDomains peteches.co.uk
+     CheckHostIP yes
+     HashKnownHosts yes
+
+  Host macbook
+       SetEnv TERM=xterm-256color
+       Hostname macbook-pro.local.peteches.co.uk
+       User petermccabe
+#+end_src

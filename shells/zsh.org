@@ -25,7 +25,10 @@ A lot of systems have important startup code in =/etc/profile= so lets source th
 #+begin_src bash
 source /etc/profile
 #+end_src
-
+*** SSH Agent
+#+begin_src bash
+export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR}/ssh-agent.sock
+#+end_src
 *** PATH
 [[https://zsh.sourceforge.io/Doc/Release/Parameters.html#index-PATH][PATH]] is a colon seperated list of directories to search when running commands
 Deriving =PATH= from =path_dirs= may seem awkward, but it lets me lay out hte path directories in a visually better manner.
