@@ -153,7 +153,7 @@ Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see
 #+begin_src emacs-lisp
   (use-package yasnippet
     :ensure t
-    :bind ("C-c s" . yas-insert-snippet)
+    :bind ("C-c s" . company-yasnippet)
     :custom
     (yas-verbosity 2)
     (yas-wrap-around-region t)
@@ -268,26 +268,19 @@ Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see
   (use-package company
     :hook
     (add-hook 'after-init-hook 'global-company-mode)
-    :config
-    (setq company-minimum-prefix-length 3
-          company-tooltip-align-annotations t
-          company-tooltip-offset-display 'lines
+    :bind
+    (("C-c c" . company-complete))
+    :config (setq
+             company-minimum-prefix-length 5
+             company-tooltip-align-annotations t
+             company-tooltip-offset-display 'lines
 
-          company-dabbrev-minimum-length 5
-          company-dabbrev-other-buffers t
+             company-dabbrev-minimum-length 5
+             company-dabbrev-other-buffers t
 
-          company-files-exclusions '(".git/" ".DS_Store")
+             company-show-quick-access 'left
 
-          company-backends `((company-yasnippet  :with
-                                           company-capf
-                                           company-dabbrev
-                                           company-files
-                                           ))
-          )
-    (with-eval-after-load 'company
-      (define-key company-active-map (kbd "RET") nil)
-      (define-key company-active-map (kbd "M-RET") #'company-complete-selection))
-    (company-mode))
+             company-files-exclusions '(".git/" ".DS_Store")))
 #+end_src
 
 *** Lets use a Helpful package
@@ -501,6 +494,11 @@ The [[https://github.com/akicho8/string-inflection][String Inflection]] package 
     :ensure t
 )
 #+End_src
+*** Diff / Ediff
+By default ediff opens in a new frame, which I find awkward so lets put in in a window instead.
+#+begin_src emacs-lisp
+ (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+#+end_src
 *** Docker
 I use docker a lot so lets have a docker mode
 #+begin_src emacs-lisp
@@ -1077,8 +1075,8 @@ Magit https://magit.vc is a nice git porcelain inside emacs
          (auth-sources `("~/.authinfo.gpg")))
 #+end_src
 *** GPG signing commits requires emacs act as pinentry
-#+begin_src emacs-lisp :tangle no
-(setq epg-pinentry-mode 'loopback)
+#+begin_src emacs-lisp  :tangle no
+  (setq epg-pinentry-mode 'loopback):
 #+end_src
 ** Pass
 [[https://www.passwordstore.org/][The Unix Password Store]] integrates with emacs out of the box!
