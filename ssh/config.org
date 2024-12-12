@@ -12,10 +12,11 @@
 #+end_src
 ** Defaults
 #+begin_src conf
-  Host *
-     CanonicalDomains peteches.co.uk
-     CheckHostIP yes
-     HashKnownHosts yes
+  CanonicalDomains peteches.co.uk
+  CanonicalizeHostname yes
+  CanonicalizeFallbackLocal no
+  CheckHostIP yes
+  HashKnownHosts yes
 
   Host macbook
        SetEnv TERM=xterm-256color
