@@ -153,28 +153,20 @@ Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see
 #+begin_src emacs-lisp
   (use-package yasnippet
     :ensure t
-    :bind ("C-c s" . company-yasnippet)
+    :after company
+    :bind ("C-c s" . 'company-yasnippet)
     :custom
     (yas-verbosity 2)
     (yas-wrap-around-region t)
     :config
-    (defun company-yasnippet-or-completion ()
-      (interactive)
-      (let ((yas-fallback-behavior nil))
-        (unless (yas-expand)
-          (call-interactively #'company-complete-common))))
     (setq yas-snippet-dirs (append yas-snippet-dirs
                                    '(
                                      "~/.config/emacs/snippets"  ;; personal snippets
                                      ))
           yas-triggers-in-field t)
     (yas-reload-all)
-    (yas-global-mode)
-    :hook (company-mode . (lambda ()
-                        (substitute-key-definition 'company-complete-common
-                                                   'company-yasnippet-or-completion
-                                                   company-active-map)))
-  )
+    (yas-global-mode))
+
 #+end_src
 
 *** Aggressive indenting
@@ -229,14 +221,14 @@ Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see
     :bind (:map ivy-minibuffer-map
 	   ("TAB" . ivy-alt-done)
 	   ("C-l" . ivy-alt-done)
-	   ("C-j" . ivy-next-line)
-	   ("C-k" . ivy-previous-line)
+	   ("C-n" . ivy-next-line)
+	   ("C-p" . ivy-previous-line)
 	   :map ivy-switch-buffer-map
-	   ("C-k" . ivy-previous-line)
+	   ("C-p" . ivy-previous-line)
 	   ("C-l" . ivy-done)
 	   ("C-d" . ivy-switch-buffer-kill)
 	   :map ivy-reverse-i-search-map
-	   ("C-k" . ivy-previous-line)
+	   ("C-p" . ivy-previous-line)
 	   ("C-d" . ivy-reverse-i-search-kill))
     :config
     (ivy-mode 1))
@@ -249,7 +241,6 @@ Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see
     :init
     (ivy-rich-mode 1))
 #+end_src
-
 **** Add counsel
 #+begin_src emacs-lisp
 (use-package counsel
@@ -280,7 +271,12 @@ Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see
 
              company-show-quick-access 'left
 
-             company-files-exclusions '(".git/" ".DS_Store")))
+             company-files-exclusions '(".git/" ".DS_Store")
+             company-frontends '(company-pseudo-tooltip-frontend
+                                 company-echo-metadata-frontend)
+             company-backends '((company-files
+                                 company-keywords
+                                 company-capf))))
 #+end_src
 
 *** Lets use a Helpful package
