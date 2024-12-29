@@ -490,6 +490,19 @@ The [[https://github.com/akicho8/string-inflection][String Inflection]] package 
     :ensure t
 )
 #+End_src
+
+**** TabbyML
+
+#+begin_src emacs-lisp :eval true
+(with-eval-after-load 'lsp-mode
+  (lsp-register-client
+    (make-lsp-client  :new-connection (lsp-stdio-connection '("npx" "tabby-agent" "--stdio"))
+                      ;; you can select languages to enable Tabby language server
+                      :activation-fn (lsp-activate-on "go" "javascript" "toml")
+                      :priority 1
+                      :add-on? t
+                      :server-id 'tabby-agent)))
+#+end_src
 *** Diff / Ediff
 By default ediff opens in a new frame, which I find awkward so lets put in in a window instead.
 #+begin_src emacs-lisp

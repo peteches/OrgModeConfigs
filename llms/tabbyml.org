@@ -1,0 +1,22 @@
+#+Title: Peteches TabbyML Conifg
+
+* TabbyML
+[[https://tabby.tabbyml.com][TabbyML]] is a locally hosted coding assistant.
+This config isn't exported by default as I automate the deployment of my configs. Sadly the API
+Token cannot be configured outside this TOML file as far as I can see which means I either
+- Commit my API Token into git.. Big No.
+- Have to edit my config file every day after the automated config deployment, Also No.
+- Manually export this config file and add the token in then.. I suppose this is the best option.
+
+  Potentially there are some GPG options I could run down, but I can't be bothered right now.
+#+begin_src conf :tangle ~/.tabby-client/agent/config.toml :mkdirp yes :export no
+  [server]
+  endpoint = "http://nug.peteches.co.uk:8180"
+  token = "auth_XXX"
+
+  [server.requestHeaders]
+  User-Agent = "peteches/tabbyML"
+
+  [logs]
+  level = "debug"
+#+end_src
