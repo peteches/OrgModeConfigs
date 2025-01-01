@@ -9,7 +9,7 @@ Token cannot be configured outside this TOML file as far as I can see which mean
 - Manually export this config file and add the token in then.. I suppose this is the best option.
 
   Potentially there are some GPG options I could run down, but I can't be bothered right now.
-#+begin_src conf :tangle ~/.tabby-client/agent/config.toml :mkdirp yes :export no
+#+begin_src conf :eval no :tangle ~/.tabby-client/agent/config.toml :mkdirp yes :export no
   [server]
   endpoint = "http://nug.peteches.co.uk:8180"
   token = "auth_XXX"
