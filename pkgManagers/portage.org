@@ -1,0 +1,115 @@
+#+Title: Portage Configurations
+
+* Make.conf
+:PROPERTIES:
+:header-args: :eval no :tangle ~/.config/system-configs/etc/portage/make.conf :mkdirp yes
+:END:
+I typicall use Gentoo where I can so here is my portage make.conf
+
+** Dependencies
+:PROPERTIES:
+:header-args: :tangle no
+:END:
+#+begin_src bash :eval yes
+  sudo emerge \
+       app-misc/resolve-march-native
+#+end_src
+
+** Computed variables
+:PROPERTIES:
+:header-args: :tangle no :eval yes
+:END:
+#+Name:resolved-march-native
+#+begin_src bash
+resolve-march-native
+#+end_src
+
+#+Name: numCpus
+#+begin_src bash
+nproc
+#+end_src
+
+#+Name: distccCpus
+#+begin_src conf
+32
+#+end_src
+
+#+Name: videoCards
+#+begin_src bash
+  if { lspci | grep VGA | grep -qi nvidia; }; then
+      echo -n '"nvidia"'
+  elif { lspci | grep VGA | grep -qi intel; }; then
+      echo -n '"intel"'
+  fi
+#+end_src
+
+#+Name: makeJobs
+#+begin_src bash :noweb yes
+  if [[ $(hostname) == "nug.peteches.co.uk" ]]; then
+    nproc
+  else
+    echo $(((($(nproc) + <<distccCpus>>) * 2) + 1))
+  fi
+#+end_src
+
+#+Name: enabledFeatures
+#+begin_src bash :noweb yes
+  features=()
+  if [[ <<distccCpus>> -gt 0 ]]; then
+     features+=("distcc")
+  fi
+  set -x
+  for (( i=0; i<${#features[@]};i++)) ; do
+        echo -n ${features[$i]}
+        if [[ $i -lt ${#features[@]} ]]; then
+          echo -n ' '
+        fi
+  done
+#+end_src
+
+** Settings
+*** Compile Flags
+#+Name: common-make-config
+#+begin_src conf :noweb yes
+  COMMON_FLAGS="-O2 -pipe <<resolved-march-native()>>"
+  CFLAGS="${COMMON_FLAGS}"
+  CXXFLAGS="${COMMON_FLAGS}"
+  FCFLAGS="${COMMON_FLAGS}"
+  FFLAGS="${COMMON_FLAGS}"
+#+end_src
+*** Make Options
+#+begin_src conf :noweb yes
+MAKE_OPTS="--jobs=<<makeJobs()>> --load-average=<<numCpus()>>"
+#+end_src
+*** Features
+#+begin_src conf :noweb yes
+FEATURES="<<enabledFeatures()>>"
+#+end_src
+*** LC settings
+This sets the language of build output to English.
+Please keep this setting intact when reporting bugs.
+#+begin_src conf
+LC_MESSAGES=C.utf8
+#+end_src
+*** Mirrors
+#+begin_src conf
+  GENTOO_MIRRORS="rsync://ftp.linux.org.tr/gentoo-distfiles/ \
+                  https://mirror.bytemark.co.uk/gentoo/"
+#+end_src
+*** Use Flags
+**** Global
+#+begin_src conf
+  USE="cryptsetup wayland emacs pulseaudio X bluetooth pipewire ffmpeg"
+#+end_src
+*** VideoCards
+#+begin_src bash :noweb yes
+  VIDEO_CARDS="<<videoCards()>>"
+#+end_src
+*** Emerge Opts
+#+begin_src conf
+EMERGE_DEFAULT_OPTS="--ask --quiet"
+#+end_src
+*** Licenses
+#+begin_src conf
+ACCEPT_LICENSE="* @EULA"
+#+end_src

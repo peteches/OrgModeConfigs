@@ -982,6 +982,7 @@ Add Babel language support this is done after installing external packages so de
    '((emacs-lisp . t)
      (shell . t)
      (go . t)
+     (lisp . t)
      (mermaid . t)
      (python . t)))
    (setq org-confirm-babel-evaluate nil)
