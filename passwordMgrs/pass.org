@@ -1,0 +1,79 @@
+#+Title Petes Pass Config
+
+Pass is an open source password manager that relies on git, gpg and some shell magic!!
+* Pass
+:PROPERTIES:
+:header-args: :eval no
+:END:
+** Noweb Variables
+#+Name: passwordDir
+#+begin_src bash :eval yes
+echo ${HOME}/.local/share/password-store
+#+end_src
+
+#+RESULTS: passwordDir
+: /home/peteches/.local/share/password-store
+
+** Install
+
+*** Gentoo
+The main package and dependencies I use
+#+begin_src bash
+  sudo euse -E -p media-gfx/zbar v4l
+  sudo emerge app-admin/pass app-admin/pass-otp media-gfx/zbar
+#+end_src
+** Setup
+*** Env Vars
+Pass is controlled by the following env variables
+#+begin_src sh :tangle ~/.config/zsh/locals.d/password-store.sh :noweb yes
+  export PASSWORD_STORE_DIR=<<passwordDir()>>
+  export PASSWORD_STORE_KEY=7D8F8A6EBD2E6278937DE393E48F5956EB783B3E
+#+end_src
+
+#+RESULTS:
+
+*** Clone passwords
+#+begin_src bash :eval yes :tangle no
+  source ~/.config/zsh/locals.d/password-store.sh
+  [[ -d ${PASSWORD_STORE_DIR} ]] || git clone git@github.com:peteches/password-store.git ${PASSWORD_STORE_DIR}
+#+end_src
+
+#+RESULTS:
+
+** Maintanence
+Password data is shared between machines via git, whichmeans when a password is updated it needs to be synced with git.
+
+#+begin_src conf :tangle ~/.config/systemd/user/SyncPasswordStore.service :mkdirp yes :noweb yes
+  [Unit]
+  Description=wrapper to run git sync operations on my password store
+  Documentation=https://www.passwordstore.org/
+
+  [Service]
+  Type=oneshot
+  Environment=PASSWORD_STORE_DIR=<<passwordDir()>>
+  ExecStartPre=pass git pull
+  ExecStart=pass git push origin main
+
+  [Install]
+  WantedBy=default.target
+#+end_src
+
+#+begin_src conf :tangle ~/.conf/systemd/user/SyncPasswordStore.timer :mkdirp yes
+  [Unit]
+  Description=Sync Password Store
+  Documentation=https://www.passwordstore.org/
+
+  [Timer]
+  OnCalendar=hourly
+  Persistent=True
+
+  [Install]
+  WantedBy=timers.target
+#+end_src
+
+#+begin_src bash :eval yes :tangle no
+    systemctl --user daemon-reload
+    systemctl --user start SyncPasswordStore.timer
+#+end_src
+
+#+RESULTS:

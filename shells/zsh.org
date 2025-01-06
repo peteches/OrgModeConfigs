@@ -342,7 +342,7 @@ These are for =.zlogin= meaning they can't be overridden by =.zshrc= for interac
 Some machines will need local configs not meant to be in version control
 #+begin_src bash
   [[ -d ~/.config/zsh/locals.d ]] || mkdir ~/.config/zsh/locals.d
-  for localDir in ~/.config/zsh/locals.d; do
+  for localDir in ~/.config/zsh/locals.d/*; do
       source ${localDir}
   done
 #+end_src
