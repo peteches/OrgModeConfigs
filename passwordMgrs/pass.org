@@ -40,6 +40,36 @@ Pass is controlled by the following env variables
 
 #+RESULTS:
 
+*** Wofi Scripts
+#+begin_src bash :shebang #!/usr/bin/env bash :tangle ~/.local/bin/passwordWofi.sh :noweb yes
+
+  export PASSWORD_STORE_DIR=<<passwordDir()>>
+  password=$( find ${PASSWORD_STORE_DIR} -type f -name '*.gpg' -printf '%P\n' \
+                  |  sed 's/.gpg//' \
+                  | wofi --dmenu \
+                         --insensitive \
+                         --prompt "Select Password:")
+
+  fields=$( echo Password; pass show "${password}" | awk -F: 'NR>1{print $1}' )
+
+  field=$( echo -e "${fields}" \
+               | sed '/^\s*$/d'  \
+               | wofi \
+                     --dmenu \
+                     --insensitive \
+                     --prompt "Choose entry:" )
+
+  case ${field} in
+      Password)
+          pass --clip "${password}"
+          ;;
+      ,*)
+       source <(sed -n '0,/END platform definable/p' $(which pass)) # gives access to the clip() function to copy data securely
+       clip $(pass show "${password}" | sed -n "/^${field}/s/^${field}\s*:\s*//p" ) "${password}"
+       ;;
+  esac
+#+end_src
+
 ** Maintanence
 Password data is shared between machines via git, whichmeans when a password is updated it needs to be synced with git.
 
