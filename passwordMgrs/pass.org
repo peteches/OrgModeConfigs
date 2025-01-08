@@ -50,7 +50,7 @@ Pass is controlled by the following env variables
                          --insensitive \
                          --prompt "Select Password:")
 
-  fields=$( echo Password; pass show "${password}" | awk -F: 'NR>1{print $1}' )
+  fields=$( echo 'Password\notp\nsetupOtp'; pass show "${password}" | awk -F: 'NR>1{print $1}' )
 
   field=$( echo -e "${fields}" \
                | sed '/^\s*$/d'  \
@@ -62,6 +62,13 @@ Pass is controlled by the following env variables
   case ${field} in
       Password)
           pass --clip "${password}"
+          ;;
+      otp)
+          pass otp --clip "${password}"
+          ;;
+      setupOtp)
+          hyprshot --mode region --clipboard-only;
+          wl-paste | zbarimg -q --raw - | pass otp append "${password}"
           ;;
       ,*)
        source <(sed -n '0,/END platform definable/p' $(which pass)) # gives access to the clip() function to copy data securely
