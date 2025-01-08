@@ -9,10 +9,15 @@ Token cannot be configured outside this TOML file as far as I can see which mean
 - Manually export this config file and add the token in then.. I suppose this is the best option.
 
   Potentially there are some GPG options I could run down, but I can't be bothered right now.
-#+begin_src conf :eval no :tangle ~/.tabby-client/agent/config.toml :mkdirp yes :export no
+  #+Name: tabbyAuthToken
+  #+begin_src bash
+pass show tabbyml.com/tabbyml@peteches.co.uk | awk -F': *' '$1 == "Token" {print($2)}'
+  #+end_src
+
+#+begin_src conf :eval no :tangle ~/.tabby-client/agent/config.toml :mkdirp yes :export no :noweb yes
   [server]
   endpoint = "http://nug.peteches.co.uk:8180"
-  token = "auth_XXX"
+  token = "<<tabbyAuthToken()>>"
 
   [server.requestHeaders]
   User-Agent = "peteches/tabbyML"
