@@ -17,25 +17,25 @@ I typicall use Gentoo where I can so here is my portage make.conf
 
 ** Computed variables
 :PROPERTIES:
-:header-args: :tangle no :eval yes
+:header-args: :tangle no :eval no
 :END:
 #+Name:resolved-march-native
-#+begin_src bash
+#+begin_src bash :eval yes
 resolve-march-native
 #+end_src
 
 #+Name: numCpus
-#+begin_src bash
+#+begin_src bash :eval yes
 nproc
 #+end_src
 
 #+Name: distccCpus
-#+begin_src conf
+#+begin_src conf :eval yes
 32
 #+end_src
 
 #+Name: videoCards
-#+begin_src bash
+#+begin_src bash :eval yes
   if { lspci | grep VGA | grep -qi nvidia; }; then
       echo -n '"nvidia"'
   elif { lspci | grep VGA | grep -qi intel; }; then
