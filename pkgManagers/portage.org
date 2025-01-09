@@ -30,7 +30,7 @@ nproc
 #+end_src
 
 #+Name: distccCpus
-#+begin_src conf :eval yes
+#+begin_src conf
 32
 #+end_src
 
