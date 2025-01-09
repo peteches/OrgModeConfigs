@@ -10,7 +10,7 @@ I typicall use Gentoo where I can so here is my portage make.conf
 :PROPERTIES:
 :header-args: :tangle no
 :END:
-#+begin_src bash :eval yes
+#+begin_src bash :eval no
   sudo emerge \
        app-misc/resolve-march-native
 #+end_src
