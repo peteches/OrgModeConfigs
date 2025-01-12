@@ -60,7 +60,11 @@ Set some =User= parameters
           email = pete@peteches.co.uk
           signingkey = A6E8150FED0029D7!
 #+end_src
-
+** Init
+#+begin_src conf
+  [init]
+	defaultBranch = main
+#+end_src
 ** Commit
 #+begin_src conf
   [commit]
