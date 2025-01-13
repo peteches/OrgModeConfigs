@@ -10,11 +10,11 @@ Token cannot be configured outside this TOML file as far as I can see which mean
 
   Potentially there are some GPG options I could run down, but I can't be bothered right now.
   #+Name: tabbyAuthToken
-  #+begin_src bash
+  #+begin_src bash :eval (if (boundp `server-process) "yes" "no")
 pass show tabbyml.com/tabbyml@peteches.co.uk | awk -F': *' '$1 == "Token" {print($2)}'
   #+end_src
 
-#+begin_src conf :eval no-export :tangle (if (boundp `server-process) "~/.tabby-client/agent/config.toml" "no") :mkdirp yes :export no :noweb yes
+#+begin_src conf :eval no :tangle (if (boundp `server-process) "~/.tabby-client/agent/config.toml" "no") :mkdirp yes :export no :noweb yes
   [server]
   endpoint = "http://nug.peteches.co.uk:8180"
   token = "<<tabbyAuthToken()>>"
