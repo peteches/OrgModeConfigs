@@ -151,7 +151,7 @@ See [[https://wiki.hyprland.org/Configuring/Dwindle-Layout/][Dwindle Layout]] fo
 ** Startup Programs
 *** Notifications
 #+begin_src conf
-  exec-once=mako
+  exec-once=mako -c ~/.config/mako/mako.conf
   exec-once=waybar
   exec-once=hypridle
 #+end_src
