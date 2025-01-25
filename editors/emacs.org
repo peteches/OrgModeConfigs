@@ -534,6 +534,15 @@ The [[https://github.com/akicho8/string-inflection][String Inflection]] package 
     :hook
     (go-ts-mode . copilot-mode))
 #+end_src
+
+***** Install chatbot
+#+begin_src emacs-lisp
+  (use-package copilot-chat
+    :bind
+    ("C-c C-a" . copilot-chat-display)
+  :hook
+  (git-commit-setup . copilot-chat-insert-commit-message))
+#+end_src
 *** Diff / Ediff
 By default ediff opens in a new frame, which I find awkward so lets put in in a window instead.
 #+begin_src emacs-lisp
