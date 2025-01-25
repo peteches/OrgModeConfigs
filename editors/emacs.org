@@ -536,13 +536,65 @@ The [[https://github.com/akicho8/string-inflection][String Inflection]] package 
 #+end_src
 
 ***** Install chatbot
+
 #+begin_src emacs-lisp
+
+
+  (defvar peteches/copilot-chat-answer-keymap (make-sparse-keymap "answers") "My answers copilot chat stuff")
+  (defvar peteches/copilot-chat-buffer-keymap (make-sparse-keymap "buffers") "My buffer related copilot chat stuff")
+  (defvar peteches/copilot-chat-helper-keymap (make-sparse-keymap "helpers") "My helper related copilot chat stuff")
+  (defvar peteches/copilot-chat-prompt-keymap (make-sparse-keymap "prompt") "My prompt related copilot chat stuff")
+  (defvar-keymap peteches/copilot-chat-basic-keymap
+    :doc "My top copilot chat keymap."
+    "a" peteches/copilot-chat-answer-keymap
+    "b" peteches/copilot-chat-buffer-keymap
+    "h" peteches/copilot-chat-helper-keymap
+    "p" peteches/copilot-chat-prompt-keymap)
+
+  (which-key-add-keymap-based-replacements peteches/copilot-chat-basic-keymap
+    "a" `("Answers" . ,peteches/copilot-chat-answer-keymap)
+    "b" `("Buffers" . ,peteches/copilot-chat-buffer-keymap)
+    "h" `("Helpers" . ,peteches/copilot-chat-helper-keymap)
+    "p" `("Prompts" . ,peteches/copilot-chat-prompt-keymap))
   (use-package copilot-chat
-    :bind
-    ("C-c C-a" . copilot-chat-display)
-  :hook
-  (git-commit-setup . copilot-chat-insert-commit-message))
+    :bind-keymap ("C-c a" . peteches/copilot-chat-basic-keymap)
+    :bind (:map peteches/copilot-chat-basic-keymap
+		("d" . copilot-chat-display)
+		("r" . copilot-chat-reset)
+		("s" . copilot-chat-switch-to-buffer)
+		("m" . copilot-chat-set-model)
+		("c" . copilot-chat-insert-commit-message)
+		("p" . 'peteches/copilot-chat-prompt-keymap)
+		:map peteches/copilot-chat-prompt-keymap
+		("c" . copilot-chat-custom-prompt-selection)
+		("p" . copilot-chat-prompt-history-previous)
+		("n" . copilot-chat-prompt-history-next)
+		("i" . copilot-chat-ask-and-insert)
+		:map peteches/copilot-chat-answer-keymap
+		("y" . copilot-chat-yank)
+		("p" . copilot-chat-yank-pop)
+		:map peteches/copilot-chat-buffer-keymap
+		("s" . copilot-chat-send-to-buffer)
+		("a" . copilot-chat-add-current-buffer)
+		("d" . copilot-chat-del-current-buffer)
+		("l" . copilot-chat-list)
+		("w" . copilot-chat-add-buffers-in-current-window)
+		("D" . copilot-chat-add-files-under-dir)
+		:map peteches/copilot-chat-helper-keymap
+		("s" . copilot-chat-explain-symbol-at-line)
+		("e" . copilot-chat-explain)
+		("r" . copilot-chat-review)
+		("d" . copilot-chat-doc)
+		("f" . copilot-chat-fix)
+		("o" . copilot-chat-optimize)
+		("t" . copilot-chat-test)
+		("F" . copilot-chat-explain-defun)
+		("c" . copilot-chat-custom-promt-function)
+		("R" . copilot-chat-review-whole-buffer))
+    :hook
+    (git-commit-setup . copilot-chat-insert-commit-message))
 #+end_src
+
 *** Diff / Ediff
 By default ediff opens in a new frame, which I find awkward so lets put in in a window instead.
 #+begin_src emacs-lisp
