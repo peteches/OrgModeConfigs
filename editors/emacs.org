@@ -13,8 +13,8 @@
 ** Basics
 
 *** Add package things
-
 These will be needed for most of the rest of the config so best set it up first.
+**** use-package
 
 #+begin_src emacs-lisp
   (require 'package)
@@ -31,7 +31,23 @@ These will be needed for most of the rest of the config so best set it up first.
   (require 'use-package)
   (setq use-package-always-ensure t)
 #+end_src
-
+****  straight.el
+I prefer use-package but straight can integrate with it and allows installing from git repo's directly
+#+begin_src emacs-lisp
+;; Install straight.el
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 6))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+#+end_src
 *** Function to determine platform
 
 Throughout this config I'll need to make descisions based on if it's being used on linux or mac.
@@ -502,6 +518,21 @@ The [[https://github.com/akicho8/string-inflection][String Inflection]] package 
                       :priority 1
                       :add-on? t
                       :server-id 'tabby-agent)))
+#+end_src
+**** Github Co-Pilot
+
+***** Install completions
+#+begin_src emacs-lisp
+  (use-package copilot
+    :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+    :config
+    (add-to-list 'copilot-major-mode-alist '("go-ts" "go"))
+    (add-to-list 'copilot-indentation-alist '(go-mode 2))
+    (add-to-list 'copilot-indentation-alist '(go-ts-mode 2))
+    :bind
+    ("C-<tab>" . copilot-accept-completion)
+    :hook
+    (go-ts-mode . copilot-mode))
 #+end_src
 *** Diff / Ediff
 By default ediff opens in a new frame, which I find awkward so lets put in in a window instead.
