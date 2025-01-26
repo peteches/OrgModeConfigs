@@ -524,15 +524,17 @@ The [[https://github.com/akicho8/string-inflection][String Inflection]] package 
 ***** Install completions
 #+begin_src emacs-lisp
   (use-package copilot
-    :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
-    :config
-    (add-to-list 'copilot-major-mode-alist '("go-ts" "go"))
-    (add-to-list 'copilot-indentation-alist '(go-mode 2))
-    (add-to-list 'copilot-indentation-alist '(go-ts-mode 2))
-    :bind
-    ("C-<tab>" . copilot-accept-completion)
-    :hook
-    (go-ts-mode . copilot-mode))
+      :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+      :config
+      (add-to-list 'copilot-major-mode-alist '("go-ts" "go"))
+      (add-to-list 'copilot-indentation-alist '(go-mode 2))
+      (add-to-list 'copilot-indentation-alist '(go-ts-mode 2))
+      :bind
+      ("C-<tab>" . copilot-accept-completion)
+      ("C-M-<tab>" . copilot-accept-completion-by-line)
+      ("C-s-<tab>" . copilot-accept-completion-by-word)
+      :hook
+      ((prog-mode text-mode) . copilot-mode))
 #+end_src
 
 ***** Install chatbot
@@ -559,38 +561,37 @@ The [[https://github.com/akicho8/string-inflection][String Inflection]] package 
   (use-package copilot-chat
     :bind-keymap ("C-c a" . peteches/copilot-chat-basic-keymap)
     :bind (:map peteches/copilot-chat-basic-keymap
-		("d" . copilot-chat-display)
-		("r" . copilot-chat-reset)
-		("s" . copilot-chat-switch-to-buffer)
-		("m" . copilot-chat-set-model)
-		("c" . copilot-chat-insert-commit-message)
-		("p" . 'peteches/copilot-chat-prompt-keymap)
-		:map peteches/copilot-chat-prompt-keymap
-		("c" . copilot-chat-custom-prompt-selection)
-		("p" . copilot-chat-prompt-history-previous)
-		("n" . copilot-chat-prompt-history-next)
-		("i" . copilot-chat-ask-and-insert)
-		:map peteches/copilot-chat-answer-keymap
-		("y" . copilot-chat-yank)
-		("p" . copilot-chat-yank-pop)
-		:map peteches/copilot-chat-buffer-keymap
-		("s" . copilot-chat-send-to-buffer)
-		("a" . copilot-chat-add-current-buffer)
-		("d" . copilot-chat-del-current-buffer)
-		("l" . copilot-chat-list)
-		("w" . copilot-chat-add-buffers-in-current-window)
-		("D" . copilot-chat-add-files-under-dir)
-		:map peteches/copilot-chat-helper-keymap
-		("s" . copilot-chat-explain-symbol-at-line)
-		("e" . copilot-chat-explain)
-		("r" . copilot-chat-review)
-		("d" . copilot-chat-doc)
-		("f" . copilot-chat-fix)
-		("o" . copilot-chat-optimize)
-		("t" . copilot-chat-test)
-		("F" . copilot-chat-explain-defun)
-		("c" . copilot-chat-custom-promt-function)
-		("R" . copilot-chat-review-whole-buffer))
+                ("d" . copilot-chat-display)
+                ("r" . copilot-chat-reset)
+                ("s" . copilot-chat-switch-to-buffer)
+                ("m" . copilot-chat-set-model)
+                ("c" . copilot-chat-insert-commit-message)
+                :map peteches/copilot-chat-prompt-keymap
+                ("c" . copilot-chat-custom-prompt-selection)
+                ("p" . copilot-chat-prompt-history-previous)
+                ("n" . copilot-chat-prompt-history-next)
+                ("i" . copilot-chat-ask-and-insert)
+                :map peteches/copilot-chat-answer-keymap
+                ("y" . copilot-chat-yank)
+                ("p" . copilot-chat-yank-pop)
+                :map peteches/copilot-chat-buffer-keymap
+                ("s" . copilot-chat-send-to-buffer)
+                ("a" . copilot-chat-add-current-buffer)
+                ("d" . copilot-chat-del-current-buffer)
+                ("l" . copilot-chat-list)
+                ("w" . copilot-chat-add-buffers-in-current-window)
+                ("D" . copilot-chat-add-files-under-dir)
+                :map peteches/copilot-chat-helper-keymap
+                ("s" . copilot-chat-explain-symbol-at-line)
+                ("e" . copilot-chat-explain)
+                ("r" . copilot-chat-review)
+                ("d" . copilot-chat-doc)
+                ("f" . copilot-chat-fix)
+                ("o" . copilot-chat-optimize)
+                ("t" . copilot-chat-test)
+                ("F" . copilot-chat-explain-defun)
+                ("c" . copilot-chat-custom-promt-function)
+                ("R" . copilot-chat-review-whole-buffer))
     :hook
     (git-commit-setup . copilot-chat-insert-commit-message))
 #+end_src
