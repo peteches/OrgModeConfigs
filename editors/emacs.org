@@ -524,17 +524,20 @@ The [[https://github.com/akicho8/string-inflection][String Inflection]] package 
 ***** Install completions
 #+begin_src emacs-lisp
   (use-package copilot
-      :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
-      :config
-      (add-to-list 'copilot-major-mode-alist '("go-ts" "go"))
-      (add-to-list 'copilot-indentation-alist '(go-mode 2))
-      (add-to-list 'copilot-indentation-alist '(go-ts-mode 2))
-      :bind
-      ("C-<tab>" . copilot-accept-completion)
-      ("C-M-<tab>" . copilot-accept-completion-by-line)
-      ("C-s-<tab>" . copilot-accept-completion-by-word)
-      :hook
-      ((prog-mode text-mode) . copilot-mode))
+    :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+    :config
+    (add-to-list 'copilot-major-mode-alist '("go-ts" "go"))
+    (add-to-list 'copilot-indentation-alist '(prog-mode 2))
+    (add-to-list 'copilot-indentation-alist '(org-mode 2))
+    (add-to-list 'copilot-indentation-alist '(text-mode 2))
+    (add-to-list 'copilot-indentation-alist '(closure-mode 2))
+    (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2))
+    :bind
+    ("C-<tab>" . copilot-accept-completion)
+    ("C-M-<tab>" . copilot-accept-completion-by-line)
+    ("C-s-<tab>" . copilot-accept-completion-by-word)
+    :hook
+    ((prog-mode textmode) . copilot-mode))
 #+end_src
 
 ***** Install chatbot
@@ -1138,26 +1141,28 @@ This snippet adds a hook to =org-mode= buffers so that =efs/org-babel-tangle-con
 
 f*** Use projectile to help navigate projects
 #+begin_src emacs-lisp
-      (use-package projectile
-        :diminish projectile-mode
-        :config
-        (projectile-mode)
-        (projectile-register-project-type 'golang '("go.mod" "go.sum")
-                                          :project-file "go.mod"
-                                          :compile "go build"
-                                          :test "go test ./..."
-                                          :run "go run"
-                                          :test-suffix "_test.go")
-        (add-to-list 'projectile-project-root-files "go.mod")
-        (setq projectile-project-search-path '(("~/area_51/" . 10)))
-        (setq projectile-indexing-method 'alien)
-        (setq projectile-generic-command '"fd --print0 --type file")
+  (use-package projectile
+    :diminish projectile-mode
+    :config
+    (projectile-mode)
+    (projectile-register-project-type 'golang '("go.mod" "go.sum")
+                                      :project-file "go.mod"
+                                      :compile "go build"
+                                      :test "go test ./..."
+                                      :run "go run"
+                                      :test-suffix "_test")
+    (add-to-list 'projectile-project-root-files "go.mod")
+    (setq projectile-project-search-path '(("~/area_51/github.com/peteches" . 10)
+                                           ("~/area_51/gitlab.com/peteches" . 10)
+                                           ("~/area_51/github.com/ScorePlay-Inc" . 10))
+          projectile-indexing-method 'alien
+          projectile-generic-command '"fd --print0 --type file")
 
-        :custom
-        (projectile-completion-system 'ivy)
+    :custom
+    (projectile-completion-system 'ivy)
 
-        :bind-keymap
-        ("C-c p" . projectile-command-map))
+    :bind-keymap
+    ("C-c p" . projectile-command-map))
 
 #+end_src
 
