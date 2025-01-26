@@ -532,7 +532,7 @@ The [[https://github.com/akicho8/string-inflection][String Inflection]] package 
     :bind
     ("C-<tab>" . copilot-accept-completion)
     :hook
-    (go-ts-mode . copilot-mode))
+    ((prog-mode textmode) . copilot-mode))
 #+end_src
 
 ***** Install chatbot
