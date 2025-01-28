@@ -148,7 +148,7 @@ Most of the below are defaults, with hyprland configs swiched in.
 #+begin_src css :tangle ~/.config/waybar/style.css
     ,* {
         /* `otf-font-awesome` is required to be installed for icons */
-        font-family: FontAwesome, Roboto, Helvetica, Arial, sans-serif;
+        font-family: Noto Color Emoji, FontAwesome, Roboto, Helvetica, Arial, sans-serif;
         font-size: 13px;
     }
 
@@ -172,7 +172,6 @@ Most of the below are defaults, with hyprland configs swiched in.
         background-color: #FFFFFF;
     }
     ,*/
-
     window#waybar.termite {
         background-color: #3F3F3F;
     }
