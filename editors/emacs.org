@@ -309,6 +309,57 @@ Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see
   )
 #+end_src
 
+** Window Management
+After reading an excellent article about the [[https://www.masteringemacs.org/article/demystifying-emacs-window-manager][Emacs Window manager]] I have decided I want some of that action!!
+
+*** Settings
+#+begin_src emacs-lisp
+  (setq switch-to-buffer-in-dedicated-window "pop"
+        switch-to-buffer-obey-display-actions t)
+#+end_src
+*** Help windows
+Help windows cause me a pain, I often am reluctant to use them as they spawn windows all over the place. Hopefully this should encourage me to use them more now this is fixed.
+
+#+begin_src emacs-lisp
+  ; *helpful command: org-capture-goto-last-stored*
+  ; *Help*
+  (add-to-list 'display-buffer-alist
+             '("\\*\\(helpful.*\\|Help\\)\\*"
+               (display-buffer-reuse-window display-buffer-pop-up-window)
+               (no-other-window)
+               (inhibit-switch-frame t)
+               (inhibit-same-window t)))
+#+end_src
+*** Compilation windows
+I make use of compilation windows a lot and default window placement bugs me so...
+#+begin_src emacs-lisp
+  (add-to-list 'display-buffer-alist
+             '("\\*compilation\\*"
+               (display-buffer-in-side-window)
+               (side . bottom)
+               (slot . 1)
+               (window-height . 0.2)
+               (window-properties
+                (no-other-window . t)
+                (no-delete-other-windows . t))))
+#+end_src
+*** Magit windows
+#+begin_src emacs-lisp
+  (add-to-list 'display-buffer-alist
+             '("\\magit"
+               (display-buffer-in-side-window)
+               (side . right)
+               (window-width . 0.2)))
+#+end_src
+*** terminal windows
+#+begin_src emacs-lisp
+  (add-to-list 'display-buffer-alist
+               '("\\*term"
+                 (display-buffer-in-side-window)
+                 (side . bottom)
+                 (slot . 0)
+                 (window-height . 0.2)))
+#+end_src
 ** Keybindings
 *** Install general (A keybinding package)
 General allows us to define custom prefixes and easily map all the child mapping within it.
