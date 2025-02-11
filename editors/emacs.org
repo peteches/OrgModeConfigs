@@ -560,7 +560,7 @@ The [[https://github.com/akicho8/string-inflection][String Inflection]] package 
 
 **** TabbyML
 
-#+begin_src emacs-lisp :eval true
+#+begin_src emacs-lisp :eval true :tangle no
 (with-eval-after-load 'lsp-mode
   (lsp-register-client
     (make-lsp-client  :new-connection (lsp-stdio-connection '("npx" "tabby-agent" "--stdio"))
@@ -705,6 +705,12 @@ I like Golang so lets set it up
         treesit-language-source-alist)
   (push '(go-mode . go-ts-mode)
         major-mode-remap-alist)
+#+end_src
+
+*** Terraform
+#+begin_src emacs-lisp
+  (use-package terraform-mode
+             :ensure t)x
 #+end_src
 *** Elisp
 **** Treesitter grammer
