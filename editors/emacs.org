@@ -309,6 +309,12 @@ Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see
   )
 #+end_src
 
+** Epub reader
+Apparently emacs supports epub via [[https://github.com/emacsmirror/nov][nov.el]]!
+#+begin_src emacs-lisp
+  (use-package nov
+    :ensure t)
+#+end_src
 ** Window Management
 After reading an excellent article about the [[https://www.masteringemacs.org/article/demystifying-emacs-window-manager][Emacs Window manager]] I have decided I want some of that action!!
 
@@ -710,7 +716,7 @@ I like Golang so lets set it up
 *** Terraform
 #+begin_src emacs-lisp
   (use-package terraform-mode
-             :ensure t)x
+             :ensure t)
 #+end_src
 *** Elisp
 **** Treesitter grammer
