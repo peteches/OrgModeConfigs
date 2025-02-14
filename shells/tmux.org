@@ -5,9 +5,9 @@
 
 * Install
 :PROPERTIES:
-:header-args: :tangle no
+:header-args: :eval no :tangle no
 :END:
-#+begin_src emacs-lisp
+#+begin_src bash
 emerge app-misc/tmux
 #+end_src
 
