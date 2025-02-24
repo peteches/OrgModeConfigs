@@ -3,7 +3,7 @@
 Pass is an open source password manager that relies on git, gpg and some shell magic!!
 * Pass
 :PROPERTIES:
-:header-args: :eval no
+:header-args: :eval no :mkdirp yes
 :END:
 ** Noweb Variables
 #+Name: passwordDir
