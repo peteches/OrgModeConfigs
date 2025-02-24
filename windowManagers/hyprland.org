@@ -1,4 +1,4 @@
-
+o
 #+title: Peteches Hyprland config
 #+PROPERTY: header-args :results silent :mkdirp yes
 
@@ -16,7 +16,7 @@ The [[https://wiki.hyprland.org/Configuring/Monitors/][Monitors]] section of the
 #+begin_src conf
   monitor=,preferred,auto,1
   monitor=eDP-1,preffered,auto,2
-  monitor=DP-2,preferred,auto-left,1
+  monitor=DP-2,preferred,auto-up,1
 #+end_src
 
 ** Variables
