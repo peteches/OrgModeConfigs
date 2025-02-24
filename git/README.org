@@ -11,7 +11,7 @@ To install pre-commit o Gentoo:
 
 * Global Ignores
 :PROPERTIES:
-:header-args: :tangle ~/.config/git/ignore :eval no
+:header-args+: :tangle ~/.config/git/ignore
 :END:
 [[https://github.com/github/gitignore][GitHub Gitignore]] repo has many great gitignore files for all sorts of stuff, so I'm +stealing+ making use of the good effort they have already put in.
 This snippet uses [[https://www.gnu.org/software/emacs/manual/html_node/org/Noweb-Reference-Syntax.html][NoWeb]] to write a babel function that gets the specified gitignore from [[https://github.com/github/gitignore]]
