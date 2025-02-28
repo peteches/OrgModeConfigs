@@ -37,12 +37,10 @@ Then our =gitignore= becomes several calls to that function
   <<getIgnores(ignoreFile="Global/Patch.gitignore")>>
   <<getIgnores(ignoreFile="Global/Tags.gitignore")>>
   <<getIgnores(ignoreFile="Global/Vim.gitignore")>>
-  <<getIgnores(ignoreFile="Global/VirtualEnv.gitignore")>>
   <<getIgnores(ignoreFile="Global/macOS.gitignore")>>
   <<getIgnores(ignoreFile="Autotools.gitignore")>>
   <<getIgnores(ignoreFile="Elisp.gitignore")>>
   <<getIgnores(ignoreFile="Go.gitignore")>>
-  <<getIgnores(ignoreFile="Python.gitignore")>>
   <<getIgnores(ignoreFile="Tex.gitignore")>>
   <<getIgnores(ignoreFile="Terraform.gitignore")>>
 #+end_src

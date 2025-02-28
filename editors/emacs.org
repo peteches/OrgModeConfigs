@@ -80,19 +80,10 @@ Throughout this config I'll need to make descisions based on if it's being used 
   (setq vc-follow-symlinks t)
 #+end_src
 
-**** setup line numbering everywhere
+**** setup line numbering everywhere important
 #+begin_src emacs-lisp
-  (global-display-line-numbers-mode 'relative)
   (column-number-mode)
-#+end_src
-
-**** except some modes
-#+begin_src emacs-lisp
-  (dolist (mode '(org-mode-hook
-		  term-mode-hook
-                  shell-mode-hook
-		  eshell-mode-hook))
-    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+  (add-hook 'prog-mode (lambda () (display-line-numbers-mode 0)))
 
 #+end_src
 
@@ -350,7 +341,8 @@ I make use of compilation windows a lot and default window placement bugs me so.
                 (no-delete-other-windows . t))))
 #+end_src
 *** Magit windows
-#+begin_src emacs-lisp
+this does some weird stuff with ediff as it's no longer a main window. I may come back to it in future.
+#+begin_src emacs-lisp :tangle no
   (add-to-list 'display-buffer-alist
              '("\\magit"
                (display-buffer-in-side-window)
@@ -1218,8 +1210,7 @@ f*** Use projectile to help navigate projects
     (setq projectile-project-search-path '(("~/area_51/github.com/peteches" . 10)
                                            ("~/area_51/gitlab.com/peteches" . 10)
                                            ("~/area_51/github.com/ScorePlay-Inc" . 10))
-          projectile-indexing-method 'alien
-          projectile-generic-command '"fd --print0 --type file")
+          projectile-indexing-method 'alien)
 
     :custom
     (projectile-completion-system 'ivy)
