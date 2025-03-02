@@ -25,24 +25,24 @@ This snippet uses [[https://www.gnu.org/software/emacs/manual/html_node/org/Nowe
 
 Then our =gitignore= becomes several calls to that function
 #+begin_src conf :noweb yes
-  <<getIgnores(ignoreFile="Global/Emacs.gitignore")>>
-  <<getIgnores(ignoreFile="Global/Backup.gitignore")>>
-  <<getIgnores(ignoreFile="Global/Ansible.gitignore")>>
-  <<getIgnores(ignoreFile="Global/Archives.gitignore")>>
-  <<getIgnores(ignoreFile="Global/Diff.gitignore")>>
-  <<getIgnores(ignoreFile="Global/GPG.gitignore")>>
-  <<getIgnores(ignoreFile="Global/Images.gitignore")>>
-  <<getIgnores(ignoreFile="Global/Linux.gitignore")>>
-  <<getIgnores(ignoreFile="Global/Ninja.gitignore")>>
-  <<getIgnores(ignoreFile="Global/Patch.gitignore")>>
-  <<getIgnores(ignoreFile="Global/Tags.gitignore")>>
-  <<getIgnores(ignoreFile="Global/Vim.gitignore")>>
-  <<getIgnores(ignoreFile="Global/macOS.gitignore")>>
-  <<getIgnores(ignoreFile="Autotools.gitignore")>>
-  <<getIgnores(ignoreFile="Elisp.gitignore")>>
-  <<getIgnores(ignoreFile="Go.gitignore")>>
-  <<getIgnores(ignoreFile="Tex.gitignore")>>
-  <<getIgnores(ignoreFile="Terraform.gitignore")>>
+    <<getIgnores(ignoreFile="Global/Emacs.gitignore")>>
+    <<getIgnores(ignoreFile="Global/Backup.gitignore")>>
+    <<getIgnores(ignoreFile="Global/Ansible.gitignore")>>
+    <<getIgnores(ignoreFile="Global/Archives.gitignore")>>
+    <<getIgnores(ignoreFile="Global/Diff.gitignore")>>
+    <<getIgnores(ignoreFile="Global/GPG.gitignore")>>
+    <<getIgnores(ignoreFile="Global/Images.gitignore")>>
+    <<getIgnores(ignoreFile="Global/Linux.gitignore")>>
+    <<getIgnores(ignoreFile="Global/Ninja.gitignore")>>
+    <<getIgnores(ignoreFile="Global/Patch.gitignore")>>
+    <<getIgnores(ignoreFile="Global/Tags.gitignore")>>
+    <<getIgnores(ignoreFile="Global/Vim.gitignore")>>
+    <<getIgnores(ignoreFile="Global/macOS.gitignore")>>
+    <<getIgnores(ignoreFile="Autotools.gitignore")>>
+    <<getIgnores(ignoreFile="Elisp.gitignore")>>
+    <<getIgnores(ignoreFile="Go.gitignore")>>
+    <<getIgnores(ignoreFile="Tex.gitignore")>>
+    <<getIgnores(ignoreFile="Terraform.gitignore")>>
 #+end_src
 
 * Global Config
