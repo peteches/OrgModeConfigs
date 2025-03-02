@@ -558,7 +558,7 @@ The [[https://github.com/akicho8/string-inflection][String Inflection]] package 
 
 **** TabbyML
 
-#+begin_src emacs-lisp :eval true :tangle no
+#+begin_src emacs-lisp :eval no :tangle no
 (with-eval-after-load 'lsp-mode
   (lsp-register-client
     (make-lsp-client  :new-connection (lsp-stdio-connection '("npx" "tabby-agent" "--stdio"))
@@ -1237,7 +1237,7 @@ Magit https://magit.vc is a nice git porcelain inside emacs
          (auth-sources `("~/.authinfo.gpg")))
 #+end_src
 *** GPG signing commits requires emacs act as pinentry
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
 (setq epg-pinentry-mode 'loopback)
 #+end_src
 ** Pass
