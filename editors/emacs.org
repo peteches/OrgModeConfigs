@@ -508,30 +508,42 @@ This sets up a trace of where the point is withing the project.
 
 ***** Install LSP
 #+begin_src emacs-lisp
-    (use-package lsp-mode
-      :commands lsp lsp-deferred
-      :init
-        (setq lsp-keymap-prefix "C-c l")
-      :config
-        (lsp-enable-which-key-integration t)
-        :hook
-        (
-          (go-mode . lsp-mode)
-          (go-ts-mode . lsp-mode) ;; for treesitter go mode
-          (lsp-mode . peteches/lsp-mode-settings)
-        )
+  (use-package lsp-mode
+    :commands lsp lsp-deferred
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+    :config
+    (lsp-enable-which-key-integration t)
+    (setq lsp-file-watch-threshold 2000
+          gc-cons-threshold 100000000
+          read-process-output-max (* 1024 1024))
+    :hook
+    (
+     (go-mode . lsp-mode)
+     (go-ts-mode . lsp-mode) ;; for treesitter go mode
+     (lsp-mode . peteches/lsp-mode-settings)
+
+     )
     )
   (use-package lsp-ui
     :hook (lsp-mode . lsp-ui-mode)
     :custom
     (lsp-ui-doc-position 'bottom))
 #+end_src
+
 ***** Tramp remote dir
 I tend to install my language servers in =${HOME}/.local/bin= so that needs adding to tramp's remote path
 #+begin_src emacs-lisp
   (use-package tramp
   :ensure nil
   :config (add-to-list 'tramp-remote-path "~/.local/bin"))
+
+#+end_src
+
+To Optimise LSP [[https://emacs-lsp.github.io/lsp-mode/page/performance/#use-plists-for-deserialization][performance]] it's recommended to use plists for deserialisation.
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.eld
+(setenv "LSP_USE_PLISTS" "true")
+
 #+end_src
 **** Add IVY integration to lsp
 lsp-ivy integrates Ivy with lsp-mode to make it easy to search for things by name in your code. When you run these commands, a prompt will appear in the minibuffer allowing you to type part of the name of a symbol in your code. Results will be populated in the minibuffer so that you can find what you’re looking for and jump to that location in the code upon selecting the result.
@@ -700,10 +712,10 @@ I like Golang so lets set it up
                             (nilness . t)
                             )
           lsp-go-use-gofumpt t
-
           )
     (require 'dap-dlv-go))
 #+end_src
+
 **** Treesitter grammer
 #+begin_src emacs-lisp
   (push '(go "https://github.com/tree-sitter/tree-sitter-go")
