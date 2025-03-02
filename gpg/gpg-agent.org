@@ -1,0 +1,18 @@
+#+Title Peteches GPG-Agent stuff
+
+* GPG Agent
+:PROPERTIES:
+:header-args: :mkdirp yes :tangle ~/.gnupg/gpg-agent.conf
+:END:
+
+** Emacs Pinentry
+#+begin_src conf
+allow-emacs-pinentry
+#+end_src
+
+** Time outs
+#+begin_src conf
+  default-cache-ttl 900
+  max-cache-ttl 7200
+  pinentry-timeout 60
+#+end_src

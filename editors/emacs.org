@@ -1238,7 +1238,8 @@ Magit https://magit.vc is a nice git porcelain inside emacs
 #+end_src
 *** GPG signing commits requires emacs act as pinentry
 #+begin_src emacs-lisp
-(setq epg-pinentry-mode 'loopback)
+  (setq epg-pinentry-mode 'loopback)
+  (pinentry-start)
 #+end_src
 ** Pass
 [[https://www.passwordstore.org/][The Unix Password Store]] integrates with emacs out of the box!
