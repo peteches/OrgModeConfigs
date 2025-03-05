@@ -304,7 +304,9 @@ Going to try out [[https://github.com/joaotavora/yasnippet][yassnippet]] and see
 Apparently emacs supports epub via [[https://github.com/emacsmirror/nov][nov.el]]!
 #+begin_src emacs-lisp
   (use-package nov
-    :ensure t)
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 #+end_src
 ** Window Management
 After reading an excellent article about the [[https://www.masteringemacs.org/article/demystifying-emacs-window-manager][Emacs Window manager]] I have decided I want some of that action!!
@@ -523,6 +525,13 @@ This sets up a trace of where the point is withing the project.
     :hook (lsp-mode . lsp-ui-mode)
     :custom
     (lsp-ui-doc-position 'bottom))
+#+end_src
+***** Tramp remote dir
+I tend to install my language servers in =${HOME}/.local/bin= so that needs adding to tramp's remote path
+#+begin_src emacs-lisp
+  (use-package tramp
+  :ensure nil
+  :config (add-to-list 'tramp-remote-path "~/.local/bin"))
 #+end_src
 **** Add IVY integration to lsp
 lsp-ivy integrates Ivy with lsp-mode to make it easy to search for things by name in your code. When you run these commands, a prompt will appear in the minibuffer allowing you to type part of the name of a symbol in your code. Results will be populated in the minibuffer so that you can find what you’re looking for and jump to that location in the code upon selecting the result.
@@ -952,9 +961,7 @@ Org is installed by default, but this makes sure we're on the latest version. Al
           org-hide-emphasis-markers t
           org-startuph-inline-images t
           line-spacing 6
-          org-agenda-files '(
-                             "~/org/Tasks.org"
-                             )
+          org-agenda-files (directory-files "~/org/agenda" t ".*\.org$")
           org-image-actual-width '(900))
     )
   (dolist (ele org-agenda-files)
@@ -969,9 +976,8 @@ Org is installed by default, but this makes sure we're on the latest version. Al
     :ensure t
     :init
     (setq org-roam-v2-ack t)
-    :custom
-    (org-roam-directory "~/RoamNotes")
-    (org-roam-completion-everywhere t)
+    :custom ((org-roam-directory "~/org/roam/")
+             (org-roam-completion-everywhere t))
     :bind (("C-c n l" . org-roam-buffer-toggle)
            ("C-c n f" . org-roam-node-find)
            ("C-c n i" . org-roam-node-insert)
