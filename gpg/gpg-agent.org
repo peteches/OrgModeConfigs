@@ -2,7 +2,7 @@
 
 * GPG Agent
 :PROPERTIES:
-:header-args: :mkdirp yes :tangle ~/.gnupg/gpg-agent.conf
+:header-args: :mkdirp yes :tangle ~/.gnupg/gpg-agent.conf :eval no
 :END:
 
 ** Emacs Pinentry
