@@ -95,7 +95,7 @@ Password data is shared between machines via git, whichmeans when a password is 
   WantedBy=default.target
 #+end_src
 
-#+begin_src conf :tangle ~/.conf/systemd/user/SyncPasswordStore.timer :mkdirp yes
+#+begin_src conf :tangle ~/.config/systemd/user/SyncPasswordStore.timer :mkdirp yes
   [Unit]
   Description=Sync Password Store
   Documentation=https://www.passwordstore.org/
