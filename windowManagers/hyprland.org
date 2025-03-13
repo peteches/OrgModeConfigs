@@ -34,7 +34,7 @@ I will need to symlink integrated and nvidia cards to the paths below from /dev/
 #+end_src
 *** Some common programs referenced elsewhere in the config
 #+begin_src conf
-  $terminal = alacritty
+  $terminal = emacsclient --create-frame --eval '(eshell)'
   $fileManager = dolphin
   $menu = wofi --show drun
   $mainMod = SUPER
